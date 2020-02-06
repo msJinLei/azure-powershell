@@ -18,6 +18,7 @@
         - Additional information about change #1
 -->
 ## Upcoming Release
+* Display AzurePowershell survey url to Resolve-Error.
 
 ## Version 1.7.1
 * Disable context auto saving when AzureRmContext.json not available

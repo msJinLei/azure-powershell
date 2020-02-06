@@ -17,6 +17,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Management.Automation;
 using Microsoft.Azure.Commands.Common.Authentication.Abstractions;
+using Microsoft.Azure.Commands.Profile.Common;
+using Microsoft.Azure.Commands.Profile.Properties;
 using System.Collections;
 using Microsoft.Azure.Commands.ResourceManager.Common;
 using Microsoft.WindowsAzure.Commands.Common.CustomAttributes;
@@ -79,6 +81,8 @@ namespace Microsoft.Azure.Commands.Profile.Errors
                     HandleError(record);
                 }
             }
+            var message = string.Format(Resources.AzurePowerShellFeedback, AzureProfileConstants.AzureSurveyUrl);
+            Console.WriteLine(message);
         }
 
         private IEnumerable<ErrorRecord> GetErrorVariable()

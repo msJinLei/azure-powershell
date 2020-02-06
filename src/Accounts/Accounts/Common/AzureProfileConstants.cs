@@ -23,5 +23,7 @@ namespace Microsoft.Azure.Commands.Profile.Common
     public static class AzureProfileConstants
     {
         public const string AzureAutosaveVariable = "Azure_Profile_Autosave";
+
+        public const string AzureSurveyUrl = "https://aka.ms/azpssurvey";
     }
 }
