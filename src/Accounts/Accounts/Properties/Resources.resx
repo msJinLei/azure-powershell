@@ -474,4 +474,7 @@
   <data name="AzurePowerShellFeedback" xml:space="preserve">
     <value>The Azure PowerShell team is listening, please let us know how we are doing: {0}.</value>
   </data>
+  <data name="SendFeedbackOpenLinkAutomatically" xml:space="preserve">
+    <value>Want to provide feedback about Azure PowerShell? Take a quick survey and let us know how we are doing: {0}. (Y/N)</value>
+  </data>
 </root>

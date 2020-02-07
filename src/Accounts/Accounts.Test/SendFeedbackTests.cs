@@ -59,34 +59,34 @@ namespace Microsoft.Azure.Commands.Profile.Test
             });
         }
 
-        [Fact]
-        [Trait(Category.AcceptanceType, Category.CheckIn)]
-        public void CanSerializeSimpleFeedbackPayloadIntoProperForm()
-        {
-            var payload = new PSAzureFeedback
-            {
-                ModuleName = "Module",
-                ModuleVersion = "1.0.0",
-                SubscriptionId = Guid.NewGuid().ToString(),
-                TenantId = Guid.NewGuid().ToString(),
-                Environment = "AzureCloud",
-                Recommendation = 10,
-                PositiveComments = "Positive",
-                NegativeComments = "Negative",
-                Email = "m@e.com"
-            };
+        //[Fact]
+        //[Trait(Category.AcceptanceType, Category.CheckIn)]
+        //public void CanSerializeSimpleFeedbackPayloadIntoProperForm()
+        //{
+        //    var payload = new PSAzureFeedback
+        //    {
+        //        ModuleName = "Module",
+        //        ModuleVersion = "1.0.0",
+        //        SubscriptionId = Guid.NewGuid().ToString(),
+        //        TenantId = Guid.NewGuid().ToString(),
+        //        Environment = "AzureCloud",
+        //        Recommendation = 10,
+        //        PositiveComments = "Positive",
+        //        NegativeComments = "Negative",
+        //        Email = "m@e.com"
+        //    };
 
-            var serializedPayload = MetricHelper.SerializeCustomEventPayload(payload);
+        //    var serializedPayload = MetricHelper.SerializeCustomEventPayload(payload);
 
-            Assert.Equal(payload.ModuleName, serializedPayload["moduleName"]);
-            Assert.Equal(payload.ModuleVersion, serializedPayload["moduleVersion"]);
-            Assert.Equal(payload.SubscriptionId.ToString(), serializedPayload["subscriptionId"]);
-            Assert.Equal(payload.TenantId.ToString(), serializedPayload["tenantId"]);
-            Assert.Equal(payload.Environment, serializedPayload["environment"]);
-            Assert.Equal(payload.Recommendation.ToString(), serializedPayload["recommendation"]);
-            Assert.Equal(payload.PositiveComments, serializedPayload["positiveComments"]);
-            Assert.Equal(payload.NegativeComments, serializedPayload["negativeComments"]);
-            Assert.Equal(payload.Email, serializedPayload["email"]);
-        }
+        //    Assert.Equal(payload.ModuleName, serializedPayload["moduleName"]);
+        //    Assert.Equal(payload.ModuleVersion, serializedPayload["moduleVersion"]);
+        //    Assert.Equal(payload.SubscriptionId.ToString(), serializedPayload["subscriptionId"]);
+        //    Assert.Equal(payload.TenantId.ToString(), serializedPayload["tenantId"]);
+        //    Assert.Equal(payload.Environment, serializedPayload["environment"]);
+        //    Assert.Equal(payload.Recommendation.ToString(), serializedPayload["recommendation"]);
+        //    Assert.Equal(payload.PositiveComments, serializedPayload["positiveComments"]);
+        //    Assert.Equal(payload.NegativeComments, serializedPayload["negativeComments"]);
+        //    Assert.Equal(payload.Email, serializedPayload["email"]);
+        //}
     }
 }

@@ -158,7 +158,7 @@ namespace Microsoft.Azure.Commands.Profile.Properties {
                 return ResourceManager.GetString("AutosaveSettingFromSession", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to The Azure PowerShell team is listening, please let us know how we are doing: {0}..
         /// </summary>
@@ -831,6 +831,15 @@ namespace Microsoft.Azure.Commands.Profile.Properties {
         internal static string SendFeedbackNonInteractiveMessage {
             get {
                 return ResourceManager.GetString("SendFeedbackNonInteractiveMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Want to provide feedback about Azure PowerShell? Take a quick survey and let us know how we are doing: {0}. (Y/N).
+        /// </summary>
+        internal static string SendFeedbackOpenLinkAutomatically {
+            get {
+                return ResourceManager.GetString("SendFeedbackOpenLinkAutomatically", resourceCulture);
             }
         }
         
