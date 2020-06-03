@@ -30,6 +30,8 @@ using System.Linq;
 using System.Management.Automation;
 using System.Security;
 
+using Microsoft.Azure.Commands.ResourceManager.Common.Utilities;
+
 namespace Common.Authentication.Test.Cmdlets
 {
     [Cmdlet(VerbsCommunications.Connect, "AzAccount")]
@@ -321,7 +323,7 @@ namespace Common.Authentication.Test.Cmdlets
             Action<string> promptAction)
         {
             List<AzureTenant> result = new List<AzureTenant>();
-            var commonTenant = GetCommonTenant(account);
+            var commonTenant = SubscriptionAndTenantUtility.GetCommonTenant(account);
             try
             {
                 var commonTenantToken = AcquireAccessToken(
@@ -397,7 +399,7 @@ namespace Common.Authentication.Test.Cmdlets
         {
             if (account.Type == AzureAccount.AccountType.AccessToken)
             {
-                tenantId = tenantId ?? GetCommonTenant(account);
+                tenantId = tenantId ?? SubscriptionAndTenantUtility.GetCommonTenant(account);
                 return new SimpleAccessToken(account, tenantId);
             }
 
@@ -458,26 +460,9 @@ namespace Common.Authentication.Test.Cmdlets
                     AzureSession.Instance.ClientFactory.GetCustomHandlers());
 
             AzureContext context = new AzureContext(_profile.DefaultContext.Subscription, account, environment,
-                                        CreateTenantFromString(tenantId, accessToken.TenantId));
+                                        SubscriptionAndTenantUtility.CreateTenantFromString(tenantId, accessToken.TenantId));
 
             return subscriptionClient.ListAllSubscriptions().Select(s => ToAzureSubscription(s, context));
-        }
-
-        private static AzureTenant CreateTenantFromString(string tenantOrDomain, string accessTokenTenantId)
-        {
-            AzureTenant result = new AzureTenant();
-            Guid id;
-            if (Guid.TryParse(tenantOrDomain, out id))
-            {
-                result.Id = tenantOrDomain;
-            }
-            else
-            {
-                result.Id = accessTokenTenantId;
-                result.Directory = tenantOrDomain;
-            }
-
-            return result;
         }
 
         private List<AzureTenant> ListTenants(string tenant = "")
@@ -507,21 +492,6 @@ namespace Common.Authentication.Test.Cmdlets
                 tenant.Directory = tenantIdOrDomain;
             }
             return tenant;
-        }
-
-        private string GetCommonTenant(IAzureAccount account)
-        {
-            string result = AuthenticationFactory.CommonAdTenant;
-            if (account.IsPropertySet(AzureAccount.Property.Tenants))
-            {
-                var candidate = account.GetTenants().FirstOrDefault();
-                if (!string.IsNullOrWhiteSpace(candidate))
-                {
-                    result = candidate;
-                }
-            }
-
-            return result;
         }
 
         private bool TryGetTenantSubscription(IAccessToken accessToken,

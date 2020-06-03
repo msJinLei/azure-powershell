@@ -81,6 +81,7 @@ namespace Microsoft.Azure.Commands.ResourceManager.Common.Test
                 new AzureAccount() { Id = DefaultAccount, Type = AzureAccount.AccountType.User },
                 AzureEnvironment.PublicEnvironments[EnvironmentName.AzureCloud],
                 new AzureTenant() { Directory = DefaultDomain, Id = DefaultTenant.ToString() });
+            SelectSubscriptionClientOfOldVersion(Context);
             var profile = new AzureRmProfile();
             profile.DefaultContext = Context;
             return new RMProfileClient(profile);
@@ -108,9 +109,22 @@ namespace Microsoft.Azure.Commands.ResourceManager.Common.Test
                 new AzureAccount() { Id = DefaultAccount, Type = AzureAccount.AccountType.User },
                 AzureEnvironment.PublicEnvironments[EnvironmentName.AzureCloud],
                 new AzureTenant() { Directory = DefaultDomain, Id = DefaultTenant.ToString() });
+            SelectSubscriptionClientOfOldVersion(Context);
             var profile = new AzureRmProfile();
             profile.DefaultContext = Context;
             return profile;
+        }
+
+        static private void SelectSubscriptionClientOfOldVersion(IAzureContext context)
+        {
+            context.SetProperty(SubscriptionClientVersion.property.SubscriptionClientApiVersion, "2016-06-01");
+            context.SetProperty(SubscriptionClientVersion.property.SubscriptionClientSwitchDisabled, "true");
+        }
+
+        static private void SelectSubscriptionClientOfNewVersion(IAzureContext context)
+        {
+            context.SetProperty(SubscriptionClientVersion.property.SubscriptionClientApiVersion, "2019-06-01");
+            context.SetProperty(SubscriptionClientVersion.property.SubscriptionClientSwitchDisabled, "true");
         }
 
         public AzureRMProfileTests(ITestOutputHelper output)
@@ -1054,10 +1068,12 @@ namespace Microsoft.Azure.Commands.ResourceManager.Common.Test
             Assert.Equal(graphToken1, account.GetProperty(AzureAccount.Property.GraphAccessToken));
             Assert.True(account.IsPropertySet(AzureAccount.Property.KeyVaultAccessToken));
             Assert.Equal(keyVaultToken1, account.GetProperty(AzureAccount.Property.KeyVaultAccessToken));
+            Assert.Equal("2016-06-01", profile.DefaultContext.GetProperty(SubscriptionClientVersion.property.SubscriptionClientApiVersion));
             var toss = SetupLogin(tenants, subscriptions, subscriptions);
             var cmdlet2 = new ConnectAzureRmAccountCommand();
             cmdlet2.CommandRuntime = new MockCommandRuntime();
             cmdlet2.DefaultProfile = profile;
+            SelectSubscriptionClientOfOldVersion(cmdlet2.DefaultProfile.DefaultContext);
             var accessToken2 = Guid.NewGuid().ToString();
             var graphToken2 = Guid.NewGuid().ToString();
             var keyVaultToken2 = Guid.NewGuid().ToString();
