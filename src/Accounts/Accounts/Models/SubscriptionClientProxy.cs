@@ -21,29 +21,51 @@ using SubscriptionClientVersion2019 = Microsoft.Azure.Commands.ResourceManager.C
 
 namespace Microsoft.Azure.Commands.Profile.Models
 {
+    class SubscritpionClientCandidates : Queue<ISubscriptionClientCommon>
+    {
+        static private SubscritpionClientCandidates _instance = null;
+        static public SubscritpionClientCandidates Instance
+        {
+            get
+            {
+                if (_instance == null)
+                {
+                    _instance = new SubscritpionClientCandidates();
+                }
+                return _instance;
+            }
+        }
+
+        private SubscritpionClientCandidates()
+        {
+            Enqueue(new SubscriptionClientVersion2019());
+            Enqueue(new SubscriptionClientVersion2016());
+        }
+
+        static public void Reset()
+        {
+            _instance = null;
+        }
+    }
+
     class SubscriptionClientProxy : ISubscriptionClientCommon
     {
-        static private Queue<ISubscriptionClientCommon> clients = new Queue<ISubscriptionClientCommon>();
-
         public delegate void LoggerWriter(string message);
 
         private LoggerWriter WriteWarningMessage = null;
 
         public SubscriptionClientProxy(LoggerWriter logWriter)
         {
-            clients.Clear();
-            clients.Enqueue(new SubscriptionClientVersion2019());
-            clients.Enqueue(new SubscriptionClientVersion2016());
             WriteWarningMessage = logWriter;
         }
 
         public List<AzureTenant> ListAccountTenants(IAccessToken accessToken, IAzureEnvironment environment)
         {
-            while (clients.Count > 0)
+            while (SubscritpionClientCandidates.Instance.Count > 0)
             {
                 try
                 {
-                    return clients.Peek().ListAccountTenants(accessToken, environment);
+                    return SubscritpionClientCandidates.Instance.Peek().ListAccountTenants(accessToken, environment);
                 }
                 catch (CloudException e)
                 {
@@ -52,7 +74,7 @@ namespace Microsoft.Azure.Commands.Profile.Models
                         throw e;
                     }
                     WriteWarningMessage($"Failed to use the latest Api of subscription client: {e.Message}");
-                    clients.Dequeue();
+                    SubscritpionClientCandidates.Instance.Dequeue();
 
                 }
             }
@@ -61,11 +83,11 @@ namespace Microsoft.Azure.Commands.Profile.Models
 
         public IEnumerable<AzureSubscription> ListAllSubscriptionsForTenant(IAccessToken accessToken, IAzureAccount account, IAzureEnvironment environment)
         {
-            while (clients.Count > 0)
+            while (SubscritpionClientCandidates.Instance.Count > 0)
             {
                 try
                 {
-                    return clients.Peek().ListAllSubscriptionsForTenant(accessToken, account, environment);
+                    return SubscritpionClientCandidates.Instance.Peek().ListAllSubscriptionsForTenant(accessToken, account, environment);
                 }
                 catch (CloudException e)
                 {
@@ -74,7 +96,7 @@ namespace Microsoft.Azure.Commands.Profile.Models
                         throw e;
                     }
                     WriteWarningMessage($"Failed to use the latest Api of subscription client: {e.Message}");
-                    clients.Dequeue();
+                    SubscritpionClientCandidates.Instance.Dequeue();
 
                 }
             }
@@ -83,11 +105,11 @@ namespace Microsoft.Azure.Commands.Profile.Models
 
         public AzureSubscription GetSubscriptionById(string subscriptionId, IAccessToken accessToken, IAzureAccount account, IAzureEnvironment environment)
         {
-            while (clients.Count > 0)
+            while (SubscritpionClientCandidates.Instance.Count > 0)
             {
                 try
                 {
-                    return clients.Peek().GetSubscriptionById(subscriptionId, accessToken, account, environment);
+                    return SubscritpionClientCandidates.Instance.Peek().GetSubscriptionById(subscriptionId, accessToken, account, environment);
                 }
                 catch (CloudException e)
                 {
@@ -96,7 +118,7 @@ namespace Microsoft.Azure.Commands.Profile.Models
                         throw e;
                     }
                     WriteWarningMessage($"Failed to use the latest Api of subscription client: {e.Message}");
-                    clients.Dequeue();
+                    SubscritpionClientCandidates.Instance.Dequeue();
 
                 }
             }
@@ -107,7 +129,7 @@ namespace Microsoft.Azure.Commands.Profile.Models
         {
             get
             {
-                return 0 < clients.Count ? clients.Peek().ApiVersion : string.Empty;
+                return 0 < SubscritpionClientCandidates.Instance.Count ? SubscritpionClientCandidates.Instance.Peek().ApiVersion : string.Empty;
             }
         }
     }

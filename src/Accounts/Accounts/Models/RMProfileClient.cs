@@ -130,7 +130,7 @@ namespace Microsoft.Azure.Commands.ResourceManager.Common
                  !account.IsPropertySet(AzureAccount.Property.CertificateThumbprint))
                 ? ShowDialog.Always : ShowDialog.Never;
 
-            SubscriptionAndTenantClient = new SubscriptionClientProxy(t => WriteWarningMessage(t));
+            SubscritpionClientCandidates.Reset();
 
             if (skipValidation)
             {
