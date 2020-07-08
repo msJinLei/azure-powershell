@@ -74,8 +74,8 @@ namespace Microsoft.Azure.Commands.ResourceManager.Common.Utilities
                 new TokenCredentials(accessToken.AccessToken) as ServiceClientCredentials,
                 AzureSession.Instance.ClientFactory.GetCustomHandlers()))
             {
-                return (ListAllSubscriptions(subscriptionClient)?
-                    .Select(s => s.ToAzureSubscription(account, environment, accessToken.TenantId))).ToList() ?? new List<AzureSubscription>();
+                return (subscriptionClient.ListAllSubscriptions()?
+                    .Select(s => s.ToAzureSubscription(account, environment, accessToken.TenantId))) ?? new List<AzureSubscription>();
             }
         }
 
@@ -94,11 +94,6 @@ namespace Microsoft.Azure.Commands.ResourceManager.Common.Utilities
             }
 
             return null;
-        }
-
-        private static GenericPageEnumerable<Subscription> ListAllSubscriptions(ISubscriptionClient client)
-        {
-            return new GenericPageEnumerable<Subscription>(client.Subscriptions.List, client.Subscriptions.ListNext, ulong.MaxValue, 0);
         }
 
         public string ApiVersion { get; private set; }

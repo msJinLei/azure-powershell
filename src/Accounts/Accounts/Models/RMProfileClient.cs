@@ -404,7 +404,20 @@ namespace Microsoft.Azure.Commands.ResourceManager.Common
             if (Guid.TryParse(subscriptionId, out subscriptionIdGuid))
             {
                 IEnumerable<IAzureSubscription> subscriptionList = ListSubscriptions(tenantId);
-                subscription = subscriptionList.FirstOrDefault(s => s.GetId() == subscriptionIdGuid);
+                subscriptionList = subscriptionList.Where(s => s.GetId() == subscriptionIdGuid);
+                if(subscriptionList.Count() > 1)
+                {
+                    subscription = subscriptionList.FirstOrDefault(s => s.GetTenant() == s.GetHomeTenant());
+                    if(subscription == null)
+                    {
+                        subscription = subscriptionList.FirstOrDefault();
+                    }
+                }
+                else
+                {
+                    subscription = subscriptionList.FirstOrDefault();
+                }
+
             }
             return subscription != null;
         }
@@ -412,8 +425,19 @@ namespace Microsoft.Azure.Commands.ResourceManager.Common
         public bool TryGetSubscriptionByName(string tenantId, string subscriptionName, out IAzureSubscription subscription)
         {
             IEnumerable<IAzureSubscription> subscriptionList = ListSubscriptions(tenantId);
-            subscription = subscriptionList.FirstOrDefault(s => s.Name.Equals(subscriptionName, StringComparison.OrdinalIgnoreCase));
-
+            subscriptionList = subscriptionList.Where(s => s.Name.Equals(subscriptionName, StringComparison.OrdinalIgnoreCase));
+            if (subscriptionList.Count() > 1)
+            {
+                subscription = subscriptionList.FirstOrDefault(s => s.GetTenant() == s.GetHomeTenant());
+                if (subscription == null)
+                {
+                    subscription = subscriptionList.FirstOrDefault();
+                }
+            }
+            else
+            {
+                subscription = subscriptionList.FirstOrDefault();
+            }
             return subscription != null;
         }
 

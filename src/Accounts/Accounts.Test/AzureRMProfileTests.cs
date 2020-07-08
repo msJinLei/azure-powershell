@@ -66,7 +66,8 @@ namespace Microsoft.Azure.Commands.ResourceManager.Common.Test
             var clientFactory = new MockSubscriptionClientFactory(tenants, subscriptionList);
             var mock = new MockClientFactory(new List<object>
             {
-                clientFactory.GetSubscriptionClient()
+                clientFactory.GetSubscriptionClientVer2019(),
+                clientFactory.GetSubscriptionClientVer2016()
             }, true);
             mock.MoqClients = true;
             AzureSession.Instance.ClientFactory = mock;
@@ -93,7 +94,8 @@ namespace Microsoft.Azure.Commands.ResourceManager.Common.Test
             var clientFactory = new MockSubscriptionClientFactory(tenants, subscriptionList);
             var mock = new MockClientFactory(new List<object>
             {
-                clientFactory.GetSubscriptionClient()
+                clientFactory.GetSubscriptionClientVer2019(),
+                clientFactory.GetSubscriptionClientVer2016()
             }, true);
             mock.MoqClients = true;
             AzureSession.Instance.ClientFactory = mock;
@@ -146,6 +148,7 @@ namespace Microsoft.Azure.Commands.ResourceManager.Common.Test
                 null,
                 false,
                 null);
+            Assert.Equal("2019-06-01", client.SubscriptionAndTenantClient.ApiVersion);
         }
 
         [Fact]
@@ -165,13 +168,12 @@ namespace Microsoft.Azure.Commands.ResourceManager.Common.Test
                 TenantId = DefaultTenant.ToString()
             };
 
-            var getAsyncResponses = new Queue<Func<AzureOperationResponse<Subscription>>>();
-            getAsyncResponses.Enqueue(() =>
+            MockSubscriptionClientFactory.SubGetQueueVer2019 = new Queue<Func<AzureOperationResponse<Subscription>>>();
+            MockSubscriptionClientFactory.SubGetQueueVer2019.Enqueue(() =>
             {
                 throw new CloudException("InvalidAuthenticationTokenTenant: The access token is from the wrong issuer");
             });
-            MockSubscriptionClientFactory.SetGetAsyncResponses(getAsyncResponses);
-
+            
             Assert.Throws<PSInvalidOperationException>(() => client.Login(
                Context.Account,
                Context.Environment,
@@ -181,6 +183,7 @@ namespace Microsoft.Azure.Commands.ResourceManager.Common.Test
                null,
                false,
                null));
+            Assert.Equal("2019-06-01", client.SubscriptionAndTenantClient.ApiVersion);
         }
 
         [Fact]
@@ -231,12 +234,11 @@ namespace Microsoft.Azure.Commands.ResourceManager.Common.Test
                 TenantId = DefaultTenant.ToString()
             };
 
-            var getAsyncResponses = new Queue<Func<AzureOperationResponse<Subscription>>>();
-            getAsyncResponses.Enqueue(() =>
+            MockSubscriptionClientFactory.SubGetQueueVer2019 = new Queue<Func<AzureOperationResponse<Subscription>>>();
+            MockSubscriptionClientFactory.SubGetQueueVer2019.Enqueue(() =>
             {
                 throw new CloudException("InvalidAuthenticationTokenTenant: The access token is from the wrong issuer");
             });
-            MockSubscriptionClientFactory.SetGetAsyncResponses(getAsyncResponses);
 
             var azureRmProfile = client.Login(
                 Context.Account,
@@ -268,8 +270,8 @@ namespace Microsoft.Azure.Commands.ResourceManager.Common.Test
                 TenantId = DefaultTenant.ToString()
             };
 
-            var listAsyncResponses = new Queue<Func<AzureOperationResponse<IPage<Subscription>>>>();
-            listAsyncResponses.Enqueue(() =>
+            MockSubscriptionClientFactory.SubListQueueVer2019 = new Queue<Func<AzureOperationResponse<IPage<Subscription>>>>();
+            MockSubscriptionClientFactory.SubListQueueVer2019.Enqueue(() =>
             {
                 var sub1 = new Subscription(
                     id: DefaultSubscription.ToString(),
@@ -292,7 +294,6 @@ namespace Microsoft.Azure.Commands.ResourceManager.Common.Test
                     Body = new MockPage<Subscription>(new List<Subscription> { sub1, sub2 })
                 };
             });
-            MockSubscriptionClientFactory.SetListAsyncResponses(listAsyncResponses);
 
             var azureRmProfile = client.Login(
                 Context.Account,
@@ -1095,6 +1096,79 @@ namespace Microsoft.Azure.Commands.ResourceManager.Common.Test
             Assert.NotNull(graphMessage.Headers.Authorization);
             Assert.NotNull(graphMessage.Headers.Authorization.Parameter);
             Assert.Contains(graphToken2, graphMessage.Headers.Authorization.Parameter);
+        }
+
+        static private Queue<object> subscriptionClientsSwitcher = new Queue<object>();
+
+        private static RMProfileClient SetupSwitchTestEnvironment(List<string> tenants, params List<string>[] subscriptionLists)
+        {
+            AzureSession.Instance.AuthenticationFactory = new MockTokenAuthenticationFactory(DefaultAccount,
+                Guid.NewGuid().ToString(), DefaultTenant.ToString());
+            var subscriptionList = new Queue<List<string>>(subscriptionLists);
+            var clientFactory = new MockSubscriptionClientFactory(tenants, subscriptionList);
+
+            subscriptionClientsSwitcher.Enqueue(clientFactory.GetSubscriptionClientVer2019());
+            subscriptionClientsSwitcher.Enqueue(clientFactory.GetSubscriptionClientVer2016());
+
+            var sub = new AzureSubscription()
+            {
+                Id = DefaultSubscription.ToString(),
+                Name = DefaultSubscriptionName
+            };
+
+            sub.SetAccount(DefaultAccount);
+            sub.SetEnvironment(EnvironmentName.AzureCloud);
+            Context = new AzureContext(sub,
+                new AzureAccount() { Id = DefaultAccount, Type = AzureAccount.AccountType.User },
+                AzureEnvironment.PublicEnvironments[EnvironmentName.AzureCloud],
+                new AzureTenant() { Directory = DefaultDomain, Id = DefaultTenant.ToString() });
+            var profile = new AzureRmProfile();
+            profile.DefaultContext = Context;
+            return new RMProfileClient(profile);
+        }
+
+        [Fact]
+        [Trait(Category.AcceptanceType, Category.CheckIn)]
+        public void SubscriptionClientFallbackOldVersion()
+        {
+            var tenants = new List<string> { DefaultTenant.ToString() };
+            var firstList = new List<string> { Guid.NewGuid().ToString() };
+            var client = SetupSwitchTestEnvironment(tenants, firstList);
+
+            ((MockTokenAuthenticationFactory)AzureSession.Instance.AuthenticationFactory).TokenProvider = (account, environment, tenant) =>
+            new MockAccessToken
+            {
+                UserId = "aaa@contoso.com",
+                LoginType = LoginType.OrgId,
+                AccessToken = "bbb",
+                TenantId = DefaultTenant.ToString()
+            };
+
+            //var mock = new AccountMockClientFactory(() =>
+            //{
+            //    return subscriptionClients.Dequeue();
+            //}, true);
+            //mock.MoqClients = true;
+            //AzureSession.Instance.ClientFactory = mock;
+
+            //var getAsyncResponses = new Queue<Func<AzureOperationResponse<Subscription>>>();
+            //getAsyncResponses.Enqueue(() =>
+            //{
+            //    var e = new CloudException("The api-version is invalid. The supported versions are '2018-09-01,2018-08-01,2018-07-01,2018-06-01,2018-05-01,2018-02-01,2018-01-01,2017-12-01,2017-08-01,2017-06-01,2017-05-10,2017-05-01,2017-03-01,2016-09-01,2016-07-01,2016-06-01,2016-02-01,2015-11-01,2015-01-01,2014-04-01-preview,2014-04-01,2014-01-01,2013-03-01,2014-02-26,2014-04'.");
+            //    e.Body.Code = "InvalidApiVersionParameter";
+            //    throw e;
+            //});
+            //MockSubscriptionClientFactory.SetGetAsyncResponses(getAsyncResponses);
+
+            //var azureRmProfile = client.Login(
+            //    Context.Account,
+            //    Context.Environment,
+            //    DefaultTenant.ToString(),
+            //    DefaultSubscription.ToString(),
+            //    null,
+            //    null,
+            //    false,
+            //    null);
         }
 
 
