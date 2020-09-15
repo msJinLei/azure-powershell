@@ -69,6 +69,38 @@ function Get-AzModuleUpdateList {
         }
 
         $allModuleTable = @{}
+        <#----------------------------------------------------------------------------------------------
+        if ($installModules.ContainsKey("Az")) {
+            $max_job_count = 5
+
+            $azRepo = $installModules["Az"][0].Item2
+            $azModule = PowerShellGet\Find-Module -Name "Az" -Repository $azRepo
+            Write-Debug "$($azModule.Name) with the latest version $($azModule.Version)"
+            $dep = $null
+            foreach($dep in $azModule.Dependencies.Name) {
+                #Write-Debug "dep:$dep"
+                $repo = $azRepo
+                if($installModules.ContainsKey($dep)) {
+                    $repo = $installModules[$dep][0].Item2
+                }
+                $null = Start-ThreadJob -Name "Az.Tool.Installer" -ThrottleLimit 5 {
+                    PowerShellGet\Find-Module -Name $using:dep -Repository $using:repo
+                }
+            }
+
+            while ((Get-Job -Name "Az.Tool.Installer").Where({$_.State -eq 'Running'})) {
+                $jobs = Get-Job -Name "Az.Tool.Installer" | Wait-Job
+            }
+
+            $jobs | Foreach-Object {
+                $result = Receive-Job $_
+                $allModuleTable[$result.Name] = $result
+                Remove-Job $_
+            }
+        }
+
+        #Write-Debug ($allModuleTable | Out-String)
+        #>
         $moduleSet = [System.Collections.Generic.HashSet[string]]::new()
         $null = $modulesToCheck | ForEach-Object {$moduleSet.Add($_.Item1)}
 
