@@ -29,7 +29,8 @@ namespace Microsoft.Azure.Commands.Common.Authentication
             string tenantId,
             string resourceId,
             string userId,
-            string homeAccountId) : base(tokenCacheProvider, environment, tokenCache, tenantId, resourceId)
+            string homeAccountId,
+            bool? sendCertificateChain = null) : base(tokenCacheProvider, environment, tokenCache, tenantId, resourceId, sendCertificateChain)
         {
             UserId = userId;
             HomeAccountId = homeAccountId;

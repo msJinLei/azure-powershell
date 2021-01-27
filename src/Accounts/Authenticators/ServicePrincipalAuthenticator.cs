@@ -47,8 +47,9 @@ namespace Microsoft.Azure.PowerShell.Authenticators
 
             var options = new ClientCertificateCredentialOptions()
             {
-                AuthorityHost = new Uri(authority)
+                AuthorityHost = new Uri(authority),
             };
+            options.IncludeX5CCliamHeader = parameters.SendCertificateChain ?? options.IncludeX5CCliamHeader;
 
             if (!string.IsNullOrEmpty(spParameters.Thumbprint))
             {

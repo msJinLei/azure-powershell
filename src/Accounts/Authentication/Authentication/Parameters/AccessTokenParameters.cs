@@ -26,7 +26,8 @@ namespace Microsoft.Azure.Commands.Common.Authentication
             IAzureTokenCache tokenCache,
             string tenantId,
             string resourceId,
-            IAzureAccount account) : base(tokenCacheProvider, environment, tokenCache, tenantId, resourceId)
+            IAzureAccount account,
+            bool? sendCertificateChain = null) : base(tokenCacheProvider, environment, tokenCache, tenantId, resourceId, sendCertificateChain)
         {
             Account = account;
         }

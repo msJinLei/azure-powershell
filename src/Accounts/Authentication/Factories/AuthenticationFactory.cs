@@ -105,7 +105,8 @@ namespace Microsoft.Azure.Commands.Common.Authentication.Factories
             string promptBehavior,
             Action<string> promptAction,
             IAzureTokenCache tokenCache,
-            string resourceId = AzureEnvironment.Endpoint.ActiveDirectoryServiceEndpointResourceId)
+            string resourceId = AzureEnvironment.Endpoint.ActiveDirectoryServiceEndpointResourceId,
+            bool? sendCertificateChain = null)
         {
             IAccessToken token = null;
 
@@ -122,7 +123,7 @@ namespace Microsoft.Azure.Commands.Common.Authentication.Factories
             {
                 try
                 {
-                    while (processAuthenticator != null && processAuthenticator.TryAuthenticate(GetAuthenticationParameters(tokenCacheProvider, account, environment, tenant, password, promptBehavior, promptAction, tokenCache, resourceId), out authToken))
+                    while (processAuthenticator != null && processAuthenticator.TryAuthenticate(GetAuthenticationParameters(tokenCacheProvider, account, environment, tenant, password, promptBehavior, promptAction, tokenCache, resourceId, sendCertificateChain), false, out authToken))
                     {
                         token = authToken?.ConfigureAwait(false).GetAwaiter().GetResult();
                         if (token != null)
@@ -500,7 +501,8 @@ namespace Microsoft.Azure.Commands.Common.Authentication.Factories
             string promptBehavior,
             Action<string> promptAction,
             IAzureTokenCache tokenCache,
-            string resourceId = AzureEnvironment.Endpoint.ActiveDirectoryServiceEndpointResourceId)
+            string resourceId = AzureEnvironment.Endpoint.ActiveDirectoryServiceEndpointResourceId,
+            bool? sendCertificateChain = null)
         {
             switch (account.Type)
             {
@@ -511,30 +513,30 @@ namespace Microsoft.Azure.Commands.Common.Authentication.Factories
 
                         if (!string.IsNullOrEmpty(account.Id))
                         {
-                            return new SilentParameters(tokenCacheProvider, environment, tokenCache, tenant, resourceId, account.Id, homeAccountId);
+                            return new SilentParameters(tokenCacheProvider, environment, tokenCache, tenant, resourceId, account.Id, homeAccountId, sendCertificateChain);
                         }
 
                         if (account.IsPropertySet("UseDeviceAuth"))
                         {
-                            return new DeviceCodeParameters(tokenCacheProvider, environment, tokenCache, tenant, resourceId, account.Id, homeAccountId);
+                            return new DeviceCodeParameters(tokenCacheProvider, environment, tokenCache, tenant, resourceId, account.Id, homeAccountId, sendCertificateChain);
                         }
                         else if(account.IsPropertySet(AzureAccount.Property.UsePasswordAuth))
                         {
-                            return new UsernamePasswordParameters(tokenCacheProvider, environment, tokenCache, tenant, resourceId, account.Id, password, homeAccountId);
+                            return new UsernamePasswordParameters(tokenCacheProvider, environment, tokenCache, tenant, resourceId, account.Id, password, homeAccountId, sendCertificateChain);
                         }
 
-                        return new InteractiveParameters(tokenCacheProvider, environment, tokenCache, tenant, resourceId, account.Id, homeAccountId, promptAction);
+                        return new InteractiveParameters(tokenCacheProvider, environment, tokenCache, tenant, resourceId, account.Id, homeAccountId, promptAction, );
                     }
 
-                    return new UsernamePasswordParameters(tokenCacheProvider, environment, tokenCache, tenant, resourceId, account.Id, password, null);
+                    return new UsernamePasswordParameters(tokenCacheProvider, environment, tokenCache, tenant, resourceId, account.Id, password, null, sendCertificateChain);
                 case AzureAccount.AccountType.Certificate:
                 case AzureAccount.AccountType.ServicePrincipal:
                     password = password ?? ConvertToSecureString(account.GetProperty(AzureAccount.Property.ServicePrincipalSecret));
-                    return new ServicePrincipalParameters(tokenCacheProvider, environment, tokenCache, tenant, resourceId, account.Id, account.GetProperty(AzureAccount.Property.CertificateThumbprint), password);
+                    return new ServicePrincipalParameters(tokenCacheProvider, environment, tokenCache, tenant, resourceId, account.Id, account.GetProperty(AzureAccount.Property.CertificateThumbprint), password, sendCertificateChain);
                 case AzureAccount.AccountType.ManagedService:
-                    return new ManagedServiceIdentityParameters(tokenCacheProvider, environment, tokenCache, tenant, resourceId, account);
+                    return new ManagedServiceIdentityParameters(tokenCacheProvider, environment, tokenCache, tenant, resourceId, account, sendCertificateChain);
                 case AzureAccount.AccountType.AccessToken:
-                    return new AccessTokenParameters(tokenCacheProvider, environment, tokenCache, tenant, resourceId, account);
+                    return new AccessTokenParameters(tokenCacheProvider, environment, tokenCache, tenant, resourceId, account, sendCertificateChain);
                 default:
                     return null;
             }

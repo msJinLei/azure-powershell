@@ -28,18 +28,22 @@ namespace Microsoft.Azure.Commands.Common.Authentication
 
         public string ResourceId { get; set; }
 
+        public bool? SendCertificateChain { get; set; }
+
         public AuthenticationParameters(
             PowerShellTokenCacheProvider tokenCacheProvider,
             IAzureEnvironment environment,
             IAzureTokenCache tokenCache,
             string tenantId,
-            string resourceId)
+            string resourceId,
+            bool? sendCertificateChain)
         {
             TokenCacheProvider = tokenCacheProvider;
             Environment = environment;
             TokenCache = tokenCache;
             TenantId = tenantId;
             ResourceId = resourceId;
+            SendCertificateChain = sendCertificateChain;
         }
     }
 }
