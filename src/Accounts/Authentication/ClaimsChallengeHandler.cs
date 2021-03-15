@@ -56,8 +56,7 @@ namespace Microsoft.Azure.Commands.Common.Authentication
 
             if (!string.IsNullOrEmpty(claimsChallenge))
             {
-                await ClaimsChallengeProcessor.OnClaimsChallenageAsync(requestMessage, claimsChallenge, ClaimsChallengeUtilities.GetErrorMessage(responseMessage), cancellationToken);
-                return true;
+                return await ClaimsChallengeProcessor.OnClaimsChallenageAsync(requestMessage, claimsChallenge, ClaimsChallengeUtilities.GetErrorMessage(responseMessage), cancellationToken);
             }
 
             return false;
