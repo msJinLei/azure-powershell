@@ -10,9 +10,14 @@
     <AssemblyName>Microsoft.Azure.PowerShell.Authentication</AssemblyName>
     <RootNamespace>$(LegacyAssemblyPrefix)Common.Authentication</RootNamespace>
   </PropertyGroup>
-
+<!--
   <ItemGroup>
     <PackageReference Include="Azure.Identity" Version="1.4.0-beta.3" />
+  </ItemGroup>
+-->
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\azure-sdk-for-net\sdk\core\Azure.Core\src\Azure.Core.csproj" />
+    <ProjectReference Include="..\..\..\..\azure-sdk-for-net\sdk\identity\Azure.Identity\src\Azure.Identity.csproj" />
   </ItemGroup>
 
   <ItemGroup>
