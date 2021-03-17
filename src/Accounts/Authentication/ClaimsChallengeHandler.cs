@@ -1,25 +1,38 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿// ----------------------------------------------------------------------------------
+//
+// Copyright Microsoft Corporation
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+// http://www.apache.org/licenses/LICENSE-2.0
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+// ----------------------------------------------------------------------------------
+
+using Azure.Identity;
+using System;
 using System.Net;
 using System.Net.Http;
-using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 
-using Azure.Core;
-
-using Microsoft.Azure.Commands.Profile.Utilities;
-
 namespace Microsoft.Azure.Commands.Common.Authentication
 {
-    internal class ClaimsChallengeHandler : DelegatingHandler, ICloneable
+    public class ClaimsChallengeHandler : DelegatingHandler, ICloneable
     {
         //TODO: TokenCredential may not support CAE: SP; MSI(?)
         private IClaimsChallengeProcessor ClaimsChallengeProcessor { get; set; }
 
-
         public ClaimsChallengeHandler(IClaimsChallengeProcessor claimsChallengeProcessor)
+        {
+            ClaimsChallengeProcessor = claimsChallengeProcessor;
+        }
+
+
+        public ClaimsChallengeHandler(IClaimsChallengeProcessor claimsChallengeProcessor, HttpMessageHandler innerHandler):base(innerHandler)
         {
             ClaimsChallengeProcessor = claimsChallengeProcessor;
         }
@@ -30,16 +43,23 @@ namespace Microsoft.Azure.Commands.Common.Authentication
             if (response.StatusCode == HttpStatusCode.Unauthorized && response.Headers.WwwAuthenticate?.Count > 0)
             {
                 //TODO: catch exception if authentication failed?
-
-                if (await OnChallengeAsync(request, response, cancellationToken, true))
+                try
                 {
-                    return await base.SendAsync(request, cancellationToken);
+                    if (await OnChallengeAsync(request, response, cancellationToken, true))
+                    {
+                        return await base.SendAsync(request, cancellationToken);
+                    }
+                }
+                catch (AuthenticationFailedException e)
+                {
+                    string errorMessage = response?.GetWwwAuthenticateMessage() ?? string.Empty;
+                    throw e.FromExceptionAndAdditionalMessage(errorMessage);
                 }
             }
             return response;
         }
 
-        public object Clone()
+        public virtual object Clone()
         {
             return new ClaimsChallengeHandler(ClaimsChallengeProcessor);
         }
@@ -56,8 +76,7 @@ namespace Microsoft.Azure.Commands.Common.Authentication
 
             if (!string.IsNullOrEmpty(claimsChallenge))
             {
-                await ClaimsChallengeProcessor.OnClaimsChallenageAsync(requestMessage, claimsChallenge, cancellationToken);
-                return true;
+                return await ClaimsChallengeProcessor.OnClaimsChallenageAsync(requestMessage, claimsChallenge, cancellationToken).ConfigureAwait(false);
             }
 
             return false;

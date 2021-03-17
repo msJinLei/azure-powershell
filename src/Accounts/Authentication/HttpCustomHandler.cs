@@ -12,14 +12,26 @@
 // limitations under the License.
 // ----------------------------------------------------------------------------------
 
+using System;
 using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Microsoft.Azure.Commands.Common.Authentication
 {
-    public interface IClaimsChallengeProcessor
+    public abstract class HttpCustomHandler : DelegatingHandler, ICloneable
     {
-        ValueTask<bool> OnClaimsChallenageAsync(HttpRequestMessage request, string claimsChallenge, CancellationToken cancellationToken);
+        private IClaimsChallengeProcessor ClaimsChallengeProcessor { get; set; }
+
+        public HttpCustomHandler()
+        {
+        }
+
+        public HttpCustomHandler(HttpMessageHandler innerHandler):base(innerHandler)
+        {
+        }
+
+        public virtual object Clone()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

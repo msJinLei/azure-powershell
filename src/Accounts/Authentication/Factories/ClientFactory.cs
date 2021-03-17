@@ -78,13 +78,23 @@ namespace Microsoft.Azure.Commands.Common.Authentication.Factories
             List<Type> types = new List<Type>();
             List<object> parameterList = new List<object>();
             List<DelegatingHandler> handlerList = new List<DelegatingHandler> { DefaultCancelRetryHandler.Clone() as CancelRetryHandler};
+
             var claimsChallengeProcessor = parameters.FirstOrDefault(parameter => parameter is IClaimsChallengeProcessor) as IClaimsChallengeProcessor;
-            if(claimsChallengeProcessor !=  null)
+            if (claimsChallengeProcessor !=  null)
             {
                 handlerList.Add(new ClaimsChallengeHandler(claimsChallengeProcessor));
+
             }
 
             var customHandlers = GetCustomHandlers();
+            var baseCustomHandler = parameters.FirstOrDefault(parameter => parameter is HttpCustomHandler) as HttpCustomHandler;
+            if (baseCustomHandler == null)
+            {
+                baseCustomHandler = baseCustomHandler ?? customHandlers.FirstOrDefault(handller => handller is HttpCustomHandler) as HttpCustomHandler;
+            }
+            handlerList.Add(baseCustomHandler);
+
+            customHandlers = customHandlers.Where(handlder => !(handlder is HttpCustomHandler)).ToArray();
             if (customHandlers != null && customHandlers.Any())
             {
                 handlerList.AddRange(customHandlers);
@@ -97,7 +107,10 @@ namespace Microsoft.Azure.Commands.Common.Authentication.Factories
                 types.Add(paramType);
                 if (paramType == typeof(DelegatingHandler[]))
                 {
-                    handlerList.AddRange(obj as DelegatingHandler[]);
+                    var handlers = obj as DelegatingHandler[];
+                    handlers = handlers.Where(h => !(h is HttpCustomHandler)).ToArray();
+                    //fixme
+                    handlerList.AddRange(handlers);
                     parameterList.Add(handlerList.ToArray());
                     hasHandlers = true;
                 }

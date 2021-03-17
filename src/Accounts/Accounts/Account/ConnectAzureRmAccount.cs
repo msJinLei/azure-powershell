@@ -453,7 +453,7 @@ namespace Microsoft.Azure.Commands.Profile
                        }
                        else
                        {
-                           if (IsUsingInteractiveAuthentication())
+                           if (!IsUnknowCredentialException(ex) && IsUsingInteractiveAuthentication())
                            {
                                //Display only if user is using Interactive auth
                                WriteWarning(Resources.SuggestToUseDeviceCodeAuth);
@@ -475,6 +475,11 @@ namespace Microsoft.Azure.Commands.Profile
         {
             return exception.InnerException is MsalClientException && ((MsalClientException)exception.InnerException)?.ErrorCode == MsalError.LinuxXdgOpen
                             || (exception.Message?.ToLower()?.Contains("unable to open a web page") ?? false);
+        }
+
+        private bool IsUnknowCredentialException(AuthenticationFailedException exception)
+        {
+            return string.Equals((exception?.InnerException as MsalServiceException)?.ErrorCode, "access_denied", StringComparison.OrdinalIgnoreCase);
         }
 
         private ConcurrentQueue<Task> _tasks = new ConcurrentQueue<Task>();

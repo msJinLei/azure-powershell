@@ -15,13 +15,42 @@
 using Azure.Core;
 using Azure.Identity;
 
+using Microsoft.Azure.Graph.RBAC.Version1_6.Models;
+
 namespace Microsoft.Azure.PowerShell.Authenticators.Factories
 {
     public class AzureCredentialFactory
     {
+        public TokenCredentialOptions Options { get; set; }
+
+        public string ClientId { get; set; }
+
+        public string UserName { get; set; }
+
+        public string Password { get; set; }
+
+        public string TenantId { get; set; }
+
         public virtual TokenCredential CreateManagedIdentityCredential(string clientId)
         {
             return new ManagedIdentityCredential(clientId);
+        }
+
+        public virtual TokenCredential CreateCredentialsFromOptions()
+        {
+            if (Options is UsernamePasswordCredentialOptions)
+            {
+                return new UsernamePasswordCredential(UserName, Password, TenantId, ClientId, Options as UsernamePasswordCredentialOptions);
+            }
+            else if(Options is SharedTokenCacheCredentialOptions)
+            {
+                return new SharedTokenCacheCredential(Options as SharedTokenCacheCredentialOptions);
+            }
+            else if(Options is InteractiveBrowserCredentialOptions)
+            {
+                return new InteractiveBrowserCredential(Options as InteractiveBrowserCredentialOptions);
+            }
+            return null;
         }
     }
 }

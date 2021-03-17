@@ -16,6 +16,8 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Net.Http;
+using System.Security.Cryptography;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -74,6 +76,7 @@ namespace Microsoft.Azure.PowerShell.Authenticators
             string userId = null,
             string homeAccountId = "")
         {
+            //fixme:why fetch twice?
             var token = await tokenCredential.GetTokenAsync(requestContext, cancellationToken).ConfigureAwait(false);
             return new MsalAccessToken(tokenCredential, requestContext, token.Token, token.ExpiresOn, tenantId, userId, homeAccountId);
         }
@@ -119,7 +122,7 @@ namespace Microsoft.Azure.PowerShell.Authenticators
         {
             //TODO: Credential may not support
             var newRequestContext = new TokenRequestContext(TokenRequestContext.Scopes, null, claimsChallenge);
-            var token = await TokenCredential.GetTokenAsync(newRequestContext, cancellationToken);
+            var token = await TokenCredential.GetTokenAsync(newRequestContext, cancellationToken).ConfigureAwait(false);
             AccessToken = token.Token;
             ExpiresOn = token.ExpiresOn;
             request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", AccessToken);
