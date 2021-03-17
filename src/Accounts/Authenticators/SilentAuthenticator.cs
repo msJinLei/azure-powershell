@@ -19,8 +19,10 @@ using System.Threading.Tasks;
 using Azure.Core;
 using Azure.Identity;
 
+using Microsoft.Azure.PowerShell.Authenticators.Factories;
 using Microsoft.Azure.Commands.Common.Authentication;
 using Microsoft.Azure.Commands.Common.Authentication.Abstractions;
+
 
 namespace Microsoft.Azure.PowerShell.Authenticators
 {
@@ -36,8 +38,10 @@ namespace Microsoft.Azure.PowerShell.Authenticators
             var scopes = AuthenticationHelpers.GetScope(onPremise, resource);
             var authority = silentParameters.Environment.ActiveDirectoryAuthority;
 
-            AzureSession.Instance.TryGetComponent(nameof(PowerShellTokenCache), out PowerShellTokenCache tokenCache);
-            var options = new SharedTokenCacheCredentialOptions(tokenCache.TokenCache)
+            //AzureSession.Instance.TryGetComponent(nameof(PowerShellTokenCache), out PowerShellTokenCache tokenCache);
+            AzureSession.Instance.TryGetComponent(nameof(AzureCredentialFactory), out AzureCredentialFactory azureCredentialFactory);
+
+            var options = new SharedTokenCacheCredentialOptions(silentParameters.TokenCacheProvider?.GetTokenCache()?.TokenCache)
             {
                 EnableGuestTenantAuthentication = true,
                 ClientId = AuthenticationHelpers.PowerShellClientId,
@@ -45,10 +49,10 @@ namespace Microsoft.Azure.PowerShell.Authenticators
                 AuthorityHost = new Uri(authority),
                 TenantId = tenantId,
             };
-
-            var cacheCredential = new SharedTokenCacheCredential(options);
+            azureCredentialFactory.Options = options;
+            var cacheCredential = azureCredentialFactory.CreateCredentialsFromOptions();
             var requestContext = new TokenRequestContext(scopes);
-            var tokenTask = cacheCredential.GetTokenAsync(requestContext);
+            var tokenTask = cacheCredential.GetTokenAsync(requestContext, cancellationToken);
             return MsalAccessToken.GetAccessTokenAsync(cacheCredential, requestContext, cancellationToken, silentParameters.TenantId, silentParameters.UserId, silentParameters.HomeAccountId);
         }
 

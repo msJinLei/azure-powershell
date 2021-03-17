@@ -78,13 +78,19 @@ namespace Microsoft.Azure.Commands.Common.Authentication.Factories
             List<Type> types = new List<Type>();
             List<object> parameterList = new List<object>();
             List<DelegatingHandler> handlerList = new List<DelegatingHandler> { DefaultCancelRetryHandler.Clone() as CancelRetryHandler};
+            var customHandlers = GetCustomHandlers();
+
             var claimsChallengeProcessor = parameters.FirstOrDefault(parameter => parameter is IClaimsChallengeProcessor) as IClaimsChallengeProcessor;
-            if(claimsChallengeProcessor !=  null)
+            if (claimsChallengeProcessor !=  null)
             {
-                handlerList.Add(new ClaimsChallengeHandler(claimsChallengeProcessor));
+                var innerHandler = parameters.FirstOrDefault(parameter => parameter is ClaimsChallengeHandler) as HttpMessageHandler;
+                innerHandler = innerHandler ?? customHandlers.FirstOrDefault(handller => handller is ClaimsChallengeHandler) as HttpMessageHandler;
+                handlerList.Add(innerHandler !=  null ? new ClaimsChallengeHandler(claimsChallengeProcessor, innerHandler)
+                    : new ClaimsChallengeHandler(claimsChallengeProcessor));
+
             }
 
-            var customHandlers = GetCustomHandlers();
+            customHandlers = customHandlers.Where(handlder => !(handlder is ClaimsChallengeHandler)).ToArray();
             if (customHandlers != null && customHandlers.Any())
             {
                 handlerList.AddRange(customHandlers);
@@ -97,7 +103,9 @@ namespace Microsoft.Azure.Commands.Common.Authentication.Factories
                 types.Add(paramType);
                 if (paramType == typeof(DelegatingHandler[]))
                 {
-                    handlerList.AddRange(obj as DelegatingHandler[]);
+                    var handlers = obj as DelegatingHandler[];
+                    handlers = handlers.Where(h => !(h is ClaimsChallengeHandler)).ToArray();
+                    handlerList.AddRange(handlers as DelegatingHandler[]);
                     parameterList.Add(handlerList.ToArray());
                     hasHandlers = true;
                 }
