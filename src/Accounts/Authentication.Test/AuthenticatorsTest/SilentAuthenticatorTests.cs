@@ -12,23 +12,16 @@
 // limitations under the License.
 // ----------------------------------------------------------------------------------
 
+using Azure.Core;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-
-using Azure.Core;
-using Azure.Identity;
-
 using Microsoft.Azure.Commands.Common.Authentication;
 using Microsoft.Azure.Commands.Common.Authentication.Abstractions;
-using Microsoft.Azure.PowerShell.Authentication.Test.Mocks;
 using Microsoft.Azure.PowerShell.Authenticators;
 using Microsoft.Azure.PowerShell.Authenticators.Factories;
-using Microsoft.Rest;
 using Microsoft.WindowsAzure.Commands.ScenarioTest;
-
 using Moq;
-
 using Xunit;
 using Xunit.Abstractions;
 
@@ -39,7 +32,7 @@ namespace Common.Authenticators.Test
         private const string TestTenantId = "123";
         private const string TestResourceId = "ActiveDirectoryServiceEndpointResourceId";
 
-        private const string accessToken = "fakertoken";
+        private const string fakeToken = "faketoken";
 
         private ITestOutputHelper Output { get; set; }
 
@@ -52,7 +45,7 @@ namespace Common.Authenticators.Test
 
             public override ValueTask<AccessToken> GetTokenAsync(TokenRequestContext requestContext, CancellationToken cancellationToken)
             {
-                return new ValueTask<AccessToken>(new AccessToken(accessToken, DateTimeOffset.Now));
+                return new ValueTask<AccessToken>(new AccessToken(fakeToken, DateTimeOffset.Now));
             }
         }
 
@@ -96,7 +89,7 @@ namespace Common.Authenticators.Test
 
             //Verify
             mockAzureCredentialFactory.Verify();
-            Assert.Equal(accessToken, token.AccessToken);
+            Assert.Equal(fakeToken, token.AccessToken);
             Assert.Equal(TestTenantId, token.TenantId);
         }
     }
