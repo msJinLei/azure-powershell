@@ -37,6 +37,8 @@ using Microsoft.Identity.Client;
 using Microsoft.WindowsAzure.Commands.Common;
 using Microsoft.WindowsAzure.Commands.Utilities.Common;
 
+using System.Runtime.InteropServices;
+
 namespace Microsoft.Azure.Commands.Profile
 {
     /// <summary>
@@ -51,6 +53,7 @@ namespace Microsoft.Azure.Commands.Profile
         public const string UserWithCredentialParameterSet = "UserWithCredential";
         public const string ServicePrincipalParameterSet = "ServicePrincipalWithSubscriptionId";
         public const string ServicePrincipalCertificateParameterSet= "ServicePrincipalCertificateWithSubscriptionId";
+        public const string ServicePrincipalCertificateFileParameterSet = "ServicePrincipalCertificateFileWithSubscriptionId";
         public const string AccessTokenParameterSet = "AccessTokenWithSubscriptionId";
         public const string ManagedServiceParameterSet = "ManagedServiceLogin";
         public const string MSIEndpointVariable = "MSI_ENDPOINT";
@@ -77,11 +80,15 @@ namespace Microsoft.Azure.Commands.Profile
 
         [Parameter(ParameterSetName = ServicePrincipalCertificateParameterSet,
                     Mandatory = true, HelpMessage = "SPN")]
+        [Parameter(ParameterSetName = ServicePrincipalCertificateFileParameterSet,
+                    Mandatory = true, HelpMessage = "SPN")]
         public string ApplicationId { get; set; }
 
         [Parameter(ParameterSetName = ServicePrincipalParameterSet,
                     Mandatory = true)]
         [Parameter(ParameterSetName = ServicePrincipalCertificateParameterSet,
+                    Mandatory = false)]
+        [Parameter(ParameterSetName = ServicePrincipalCertificateFileParameterSet,
                     Mandatory = false)]
         public SwitchParameter ServicePrincipal { get; set; }
 
@@ -94,6 +101,8 @@ namespace Microsoft.Azure.Commands.Profile
         [Parameter(ParameterSetName = AccessTokenParameterSet,
                     Mandatory = false, HelpMessage = "Tenant name or ID")]
         [Parameter(ParameterSetName = ServicePrincipalCertificateParameterSet,
+                    Mandatory = true, HelpMessage = "Tenant name or ID")]
+        [Parameter(ParameterSetName = ServicePrincipalCertificateFileParameterSet,
                     Mandatory = true, HelpMessage = "Tenant name or ID")]
         [Parameter(ParameterSetName = ManagedServiceParameterSet,
                     Mandatory = false, HelpMessage = "Optional tenant name or ID")]
@@ -149,6 +158,8 @@ namespace Microsoft.Azure.Commands.Profile
                     Mandatory = false, HelpMessage = "Subscription Name or ID", ValueFromPipeline = true)]
         [Parameter(ParameterSetName = ServicePrincipalCertificateParameterSet,
                     Mandatory = false, HelpMessage = "Subscription Name or ID", ValueFromPipeline = true)]
+        [Parameter(ParameterSetName = ServicePrincipalCertificateFileParameterSet,
+                    Mandatory = false, HelpMessage = "Subscription Name or ID", ValueFromPipeline = true)]
         [Parameter(ParameterSetName = AccessTokenParameterSet,
                     Mandatory = false, HelpMessage = "Subscription Name or ID", ValueFromPipeline = true)]
         [Parameter(ParameterSetName = ManagedServiceParameterSet,
@@ -171,6 +182,7 @@ namespace Microsoft.Azure.Commands.Profile
         [Parameter(ParameterSetName = UserWithCredentialParameterSet, Mandatory = false, HelpMessage = "Max subscription number to populate contexts after login. Default is " + DefaultMaxContextPopulationString + ". To populate all subscriptions to contexts, set to -1.")]
         [Parameter(ParameterSetName = ServicePrincipalParameterSet, Mandatory = false, HelpMessage = "Max subscription number to populate contexts after login. Default is " + DefaultMaxContextPopulationString + ". To populate all subscriptions to contexts, set to -1.")]
         [Parameter(ParameterSetName = ServicePrincipalCertificateParameterSet, Mandatory = false, HelpMessage = "Max subscription number to populate contexts after login. Default is " + DefaultMaxContextPopulationString + ". To populate all subscriptions to contexts, set to -1.")]
+        [Parameter(ParameterSetName = ServicePrincipalCertificateFileParameterSet, Mandatory = false, HelpMessage = "Max subscription number to populate contexts after login. Default is " + DefaultMaxContextPopulationString + ". To populate all subscriptions to contexts, set to -1.")]
         [Parameter(ParameterSetName = AccessTokenParameterSet, Mandatory = false, HelpMessage = "Max subscription number to populate contexts after login. Default is " + DefaultMaxContextPopulationString + ". To populate all subscriptions to contexts, set to -1.")]
         [Parameter(ParameterSetName = ManagedServiceParameterSet, Mandatory = false, HelpMessage = "Max subscription number to populate contexts after login. Default is " + DefaultMaxContextPopulationString + ". To populate all subscriptions to contexts, set to -1.")]
         [PSDefaultValue(Help = DefaultMaxContextPopulationString, Value = DefaultMaxContextPopulation)]
@@ -186,7 +198,15 @@ namespace Microsoft.Azure.Commands.Profile
         public SwitchParameter Force { get; set; }
 
         [Parameter(ParameterSetName = ServicePrincipalCertificateParameterSet, Mandatory = false, HelpMessage = "Specifies if the x5c claim (public key of the certificate) should be sent to the STS to achieve easy certificate rollover in Azure AD.")]
+        [Parameter(ParameterSetName = ServicePrincipalCertificateFileParameterSet, Mandatory = false, HelpMessage = "Specifies if the x5c claim (public key of the certificate) should be sent to the STS to achieve easy certificate rollover in Azure AD.")]
         public SwitchParameter SendCertificateChain { get; set; }
+
+
+        [Parameter(ParameterSetName = ServicePrincipalCertificateFileParameterSet, Mandatory = true, HelpMessage = "The path of certficate file in pem format.")]
+        public String CertificatePath { get; set; }
+
+        [Parameter(ParameterSetName = ServicePrincipalCertificateFileParameterSet, HelpMessage = "The password required to access the X.509 certificate data.")]
+        public SecureString CertificatePassword { get; set; }
 
         protected override IAzureContext DefaultContext
         {
@@ -289,13 +309,7 @@ namespace Microsoft.Azure.Commands.Profile
                     azureAccount.SetProperty(AzureAccount.Property.KeyVaultAccessToken, KeyVaultAccessToken);
                     break;
                 case ServicePrincipalCertificateParameterSet:
-                    if (SendCertificateChain)
-                    {
-                        azureAccount.SetProperty("SendCertificateChain", SendCertificateChain.ToString());
-                        WriteDebug("SendCertificateChain is set.");
-                    }
-                    azureAccount.Type = AzureAccount.AccountType.ServicePrincipal;
-                    break;
+                case ServicePrincipalCertificateFileParameterSet:
                 case ServicePrincipalParameterSet:
                     azureAccount.Type = AzureAccount.AccountType.ServicePrincipal;  
                     break;
@@ -384,12 +398,30 @@ namespace Microsoft.Azure.Commands.Profile
                 azureAccount.SetThumbprint(CertificateThumbprint);
             }
 
+            if( !string.IsNullOrWhiteSpace(CertificatePath))
+            {
+                //fixme
+                azureAccount.SetProperty("CertificatePath", CertificatePath);
+                if (this.IsBound(nameof(CertificatePassword)))
+                {
+                    azureAccount.SetProperty("CertificatePassword", CertificatePassword.ConvertToString());
+                }
+            }
+
+            if ((ParameterSetName == ServicePrincipalCertificateParameterSet || ParameterSetName == ServicePrincipalCertificateFileParameterSet)
+                && SendCertificateChain)
+            {
+                //fixme
+                azureAccount.SetProperty("SendCertificateChain", SendCertificateChain.ToString());
+                WriteDebug("SendCertificateChain is set.");
+            }
+
             if (!string.IsNullOrEmpty(Tenant))
             {
                 azureAccount.SetProperty(AzureAccount.Property.Tenants, Tenant);
             }
 
-            if (azureAccount.Type == AzureAccount.AccountType.ServicePrincipal && string.IsNullOrEmpty(CertificateThumbprint))
+            if (azureAccount.Type == AzureAccount.AccountType.ServicePrincipal && string.IsNullOrEmpty(CertificateThumbprint) && password != null)
             {
                 azureAccount.SetProperty(AzureAccount.Property.ServicePrincipalSecret, password.ConvertToString());
                 if (GetContextModificationScope() == ContextModificationScope.CurrentUser)

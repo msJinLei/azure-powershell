@@ -13,14 +13,13 @@
 // ----------------------------------------------------------------------------------
 
 using System;
-using System.Collections.Concurrent;
+using System.IO;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using System.Threading.Tasks;
 
 using Azure.Core;
 using Azure.Identity;
-
-using Hyak.Common;
 
 using Microsoft.Azure.Commands.Common.Authentication;
 using Microsoft.Azure.Commands.Common.Authentication.Abstractions;
@@ -50,42 +49,59 @@ namespace Microsoft.Azure.PowerShell.Authenticators
             var options = new ClientCertificateCredentialOptions()
             {
                 AuthorityHost = new Uri(authority),
-                IncludeX5CCliamHeader = spParameters.SendCertificateChain ?? default(bool)
+                SendCertificateChain = spParameters.SendCertificateChain ?? default(bool)
             };
 
+            TokenCredential tokenCredential = null;
+            string parametersLog = null;
             if (!string.IsNullOrEmpty(spParameters.Thumbprint))
             {
-                //Service Principal with Certificate
-                var certificate = AzureSession.Instance.DataStore.GetCertificate(spParameters.Thumbprint);
-                ClientCertificateCredential certCredential = new ClientCertificateCredential(tenantId, spParameters.ApplicationId, certificate, options);
-                var parametersLog = $"- Thumbprint:'{spParameters.Thumbprint}', ApplicationId:'{spParameters.ApplicationId}', TenantId:'{tenantId}', Scopes:'{string.Join(",", scopes)}', AuthorityHost:'{options.AuthorityHost}'";
-                return MsalAccessToken.GetAccessTokenAsync(
-                    nameof(ServicePrincipalAuthenticator),
-                    parametersLog,
-                    certCredential,
-                    requestContext,
-                    cancellationToken,
-                    spParameters.TenantId,
-                    spParameters.ApplicationId);
+                //Service Principal with Certificate thumbprint
+                var certCertificate = AzureSession.Instance.DataStore.GetCertificate(spParameters.Thumbprint);
+                parametersLog = $"- Thumbprint:'{spParameters.Thumbprint}', ApplicationId:'{spParameters.ApplicationId}', TenantId:'{tenantId}', Scopes:'{string.Join(",", scopes)}', AuthorityHost:'{options.AuthorityHost}'";
+                tokenCredential = new ClientCertificateCredential(tenantId, spParameters.ApplicationId, certCertificate, options);
+            }
+            else if (spParameters.CertificateSecret != null)
+            {
+                //Service Principal with Certificate file and password
+                if (string.IsNullOrEmpty(spParameters.CertificatePath) || !File.Exists(spParameters.CertificatePath))
+                {
+                    parametersLog = $"- Invalid certificate path :'{spParameters.CertificatePath}'.";
+                    throw new InvalidOperationException(parametersLog);
+                }
+                else if (X509Certificate2.GetCertContentType(spParameters.CertificatePath) != X509ContentType.Pfx)
+                {
+                    parametersLog = $"- Invalid certificate file type :'{spParameters.CertificatePath}'.";
+                    throw new InvalidOperationException(parametersLog);
+                }
+                var certCertificate = new X509Certificate2(spParameters.CertificatePath, spParameters.CertificateSecret);
+                tokenCredential = new ClientCertificateCredential(tenantId, spParameters.ApplicationId, certCertificate, options);
+                parametersLog = $"- CertificatePath(with password):'{spParameters.CertificatePath}', ApplicationId:'{spParameters.ApplicationId}', TenantId:'{tenantId}', Scopes:'{string.Join(",", scopes)}', AuthorityHost:'{options.AuthorityHost}'";
+            }
+            else if (!string.IsNullOrEmpty(spParameters.CertificatePath))
+            {
+                //Service Principal with Certificate file without password
+                tokenCredential = new ClientCertificateCredential(tenantId, spParameters.ApplicationId, spParameters.CertificatePath, options);
+                parametersLog = $"- CertificatePath:'{spParameters.CertificatePath}', ApplicationId:'{spParameters.ApplicationId}', TenantId:'{tenantId}', Scopes:'{string.Join(",", scopes)}', AuthorityHost:'{options.AuthorityHost}'";
             }
             else if (spParameters.Secret != null)
             {
-                // service principal with secret
-                var secretCredential = new ClientSecretCredential(tenantId, spParameters.ApplicationId, spParameters.Secret.ConvertToString(), options);
-                var parametersLog = $"- ApplicationId:'{spParameters.ApplicationId}', TenantId:'{tenantId}', Scopes:'{string.Join(",", scopes)}', AuthorityHost:'{options.AuthorityHost}'";
-                return MsalAccessToken.GetAccessTokenAsync(
-                    nameof(ServicePrincipalAuthenticator),
-                    parametersLog,
-                    secretCredential,
-                    requestContext,
-                    cancellationToken,
-                    spParameters.TenantId,
-                    spParameters.ApplicationId);
+                //Service principal with secret
+                tokenCredential = new ClientSecretCredential(tenantId, spParameters.ApplicationId, spParameters.Secret.ConvertToString(), options);
+                parametersLog = $"- ApplicationId:'{spParameters.ApplicationId}', TenantId:'{tenantId}', Scopes:'{string.Join(",", scopes)}', AuthorityHost:'{options.AuthorityHost}'";
             }
             else
             {
                 throw new MsalException(MsalError.AuthenticationFailed, string.Format(AuthenticationFailedMessage, clientId));
             }
+            return MsalAccessToken.GetAccessTokenAsync(
+                nameof(ServicePrincipalAuthenticator),
+                parametersLog,
+                tokenCredential,
+                requestContext,
+                cancellationToken,
+                spParameters.TenantId,
+                spParameters.ApplicationId);
         }
 
         public override bool CanAuthenticate(AuthenticationParameters parameters)
