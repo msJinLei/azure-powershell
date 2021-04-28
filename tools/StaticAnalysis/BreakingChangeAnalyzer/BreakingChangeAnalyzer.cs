@@ -30,6 +30,7 @@ using Tools.Common.Issues;
 using Tools.Common.Loaders;
 using Tools.Common.Loggers;
 using Tools.Common.Models;
+using Tools.Common.Utilities;
 
 namespace StaticAnalysis.BreakingChangeAnalyzer
 {
@@ -97,8 +98,9 @@ namespace StaticAnalysis.BreakingChangeAnalyzer
             }
 
             foreach (var baseDirectory in cmdletProbingDirs.Where(s => !s.Contains("ServiceManagement") &&
-                                                                        !s.Contains("Stack") && Directory.Exists(Path.GetFullPath(s))))
+                                                                        !ModuleFilter.IsAzureStackModule(s) && Directory.Exists(Path.GetFullPath(s))))
             {
+                SharedAssemblyLoader.Load(baseDirectory);
                 var probingDirectories = new List<string> {baseDirectory};
 
                 // Add current directory for probing
@@ -135,7 +137,7 @@ namespace StaticAnalysis.BreakingChangeAnalyzer
                     var script = $"Import-LocalizedData -BaseDirectory {parentDirectory} -FileName {psd1FileName} -BindingVariable ModuleMetadata;";
                     powershell.AddScript($"{script} $ModuleMetadata.NestedModules;");
                     var cmdletResult = powershell.Invoke();
-                    var nestedModules = cmdletResult.Select(c => c.ToString()).Select(c => (c.StartsWith(".") ? c.Substring(2) : c)).ToList();
+                    var nestedModules = cmdletResult.Where(c => c != null).Select(c => c.ToString()).Select(c => (c.StartsWith(".") ? c.Substring(2) : c)).ToList();
 
                     powershell.AddScript($"{script} $ModuleMetadata.RequiredModules | % {{ $_[\"ModuleName\"] }};");
                     cmdletResult = powershell.Invoke();
@@ -174,7 +176,7 @@ namespace StaticAnalysis.BreakingChangeAnalyzer
                         var executingPath =
                             Path.GetDirectoryName(new Uri(Assembly.GetExecutingAssembly().CodeBase).AbsolutePath);
 
-                        var filePath = executingPath + "\\SerializedCmdlets\\" + fileName;
+                        var filePath = Path.Combine(executingPath, "SerializedCmdlets", fileName);
 
 #if SERIALIZE
                         SerializeCmdlets(filePath, newModuleMetadata);

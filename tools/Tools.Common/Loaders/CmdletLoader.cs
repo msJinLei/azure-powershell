@@ -40,6 +40,10 @@ namespace Tools.Common.Loaders
                 {
                     var assemblyName = args.Name.Substring(0, args.Name.IndexOf(","));
                     var dll = Directory.GetFiles(commonOutputFolder, "*.dll").FirstOrDefault(f => Path.GetFileNameWithoutExtension(f) == assemblyName);
+                    if (dll == null && Directory.Exists(commonOutputFolder + "\\PreloadAssemblies"))
+                    {
+                        dll = Directory.GetFiles(commonOutputFolder + "\\PreloadAssemblies", "*.dll").FirstOrDefault(f => Path.GetFileNameWithoutExtension(f) == assemblyName);
+                    }
                     if (dll == null)
                     {
                         continue;
@@ -64,6 +68,12 @@ namespace Tools.Common.Loaders
             var results = new List<CmdletMetadata>();
 
             ModuleMetadata = new ModuleMetadata();
+
+        /// If assemble is not dll, return directly, in the future, except for dll, we should also support psm1
+            if (!assemblyPath.EndsWith("dll")) {
+                ModuleMetadata.Cmdlets = results;
+                return ModuleMetadata;
+            }
             try
             {
                 var assembly = Assembly.LoadFrom(assemblyPath);
@@ -108,15 +118,15 @@ namespace Tools.Common.Loaders
 
                     foreach (var parameter in parameters)
                     {
-                        if (string.Equals(parameter.Name, "Force", StringComparison.OrdinalIgnoreCase) && parameter.PropertyType == typeof(SwitchParameter))
+                        if (string.Equals(parameter.MemberInfo.Name, "Force", StringComparison.OrdinalIgnoreCase) && parameter.ParameterType == typeof(SwitchParameter))
                         {
                             cmdletMetadata.HasForceSwitch = true;
                         }
 
                         var parameterData = new Models.ParameterMetadata
                         {
-                            Type = parameter.PropertyType,
-                            Name = parameter.Name
+                            Type = parameter.ParameterType,
+                            Name = parameter.MemberInfo.Name
                         };
 
                         if (parameter.HasAttribute<AliasAttribute>())
@@ -206,7 +216,7 @@ namespace Tools.Common.Loaders
             }
             catch (Exception ex)
             {
-                throw ex;
+                throw;
             }
 
             ModuleMetadata.Cmdlets = results;

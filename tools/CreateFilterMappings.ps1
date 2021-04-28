@@ -148,7 +148,7 @@ function Add-ProjectDependencies
         [string]$SolutionPath
     )
 
-    $CommonProjectsToIgnore = @( "Authentication", "Authentication.ResourceManager", "Authenticators", "ScenarioTest.ResourceManager", "TestFx", "Tests" )
+    $CommonProjectsToIgnore = @("ScenarioTest.ResourceManager", "TestFx", "Tests" )
 
     $ProjectDependencies = @()
     $Content = Get-Content -Path $SolutionPath
@@ -198,7 +198,8 @@ function Add-SolutionReference
         [string]$ServiceFolderPath
     )
 
-    $CsprojFiles = Get-ChildItem -Path $ServiceFolderPath -Filter "*.csproj" -Recurse | Where-Object { $_.FullName -notlike "*Stack*" -and $_.FullName -notlike "*.Test*" }
+    .($PSScriptRoot + "\PreloadToolDll.ps1")
+    $CsprojFiles = Get-ChildItem -Path $ServiceFolderPath -Filter "*.csproj" -Recurse | Where-Object { (-not [Tools.Common.Utilities.ModuleFilter]::IsAzureStackModule($_.FullName)) -and $_.FullName -notlike "*.Test*" }
     foreach ($CsprojFile in $CsprojFiles)
     {
         $Key = $CsprojFile.BaseName
@@ -219,7 +220,7 @@ function Create-ModuleMappings
     $Script:ModuleMappings = Initialize-Mappings -PathsToIgnore $PathsToIgnore -CustomMappings $CustomMappings
     foreach ($ServiceFolder in $Script:ServiceFolders)
     {
-        $Key = "src/$($ServiceFolder.Name)"
+        $Key = "src/$($ServiceFolder.Name)/"
         $ModuleManifestFiles = Get-ChildItem -Path $ServiceFolder.FullName -Filter "*.psd1" -Recurse | Where-Object { $_.FullName -notlike "*.Test*" -and `
                                                                                                                       $_.FullName -notlike "*Release*" -and `
                                                                                                                       $_.FullName -notlike "*Debug*" -and `
@@ -250,6 +251,17 @@ function Create-CsprojMappings
 <#
 Maps a normalized path to the projects to be built based on the service folder provided.
 #>
+
+function Get-ModuleFromPath
+{
+    param
+    (
+        [Parameter(Mandatory = $true)]
+        [string]$FilePath
+    )
+
+    return $FilePath.Replace('/', '\').Split('\src\')[1].Split('\')[0]
+}
 function Add-CsprojMappings
 {
     param
@@ -266,15 +278,22 @@ function Add-CsprojMappings
         $Values = New-Object System.Collections.Generic.HashSet[string]
         foreach ($CsprojFile in $CsprojFiles)
         {
-            $Project = $CsprojFile.BaseName
-            foreach ($Solution in $Script:ProjectToSolutionMappings[$Project])
+            $Project = Get-ModuleFromPath $CsprojFile.FullName
+            foreach ($ProjectName in $Script:ProjectToSolutionMappings.Keys)
             {
-                foreach ($ReferencedProject in $Script:SolutionToProjectMappings[$Solution])
+                foreach ($Solution in $Script:ProjectToSolutionMappings[$ProjectName])
                 {
-                    $TempValue = $Script:ProjectToFullPathMappings[$ReferencedProject]
-                    if (-not [string]::IsNullOrEmpty($TempValue))
+                    $ProjectNameFromSolution = Get-ModuleFromPath $Solution
+                    if ($ProjectNameFromSolution -eq $Project)
                     {
-                        $Values.Add($TempValue) | Out-Null
+                        foreach ($ReferencedProject in $Script:SolutionToProjectMappings[$Solution])
+                        {
+                            $TempValue = $Script:ProjectToFullPathMappings[$ReferencedProject]
+                            if (-not [string]::IsNullOrEmpty($TempValue))
+                            {
+                                $Values.Add($TempValue) | Out-Null
+                            }
+                        }
                     }
                 }
             }
@@ -291,8 +310,8 @@ $Script:ProjectToFullPathMappings = Create-ProjectToFullPathMappings
 $Script:SolutionToProjectMappings = Create-SolutionToProjectMappings
 $Script:ProjectToSolutionMappings = Create-ProjectToSolutionMappings
 
-Create-ModuleMappings
+# Create-ModuleMappings
 Create-CsprojMappings
 
-$Script:ModuleMappings | Format-Json | Set-Content -Path (Join-Path -Path $Script:RootPath -ChildPath "ModuleMappings.json")
+# $Script:ModuleMappings | Format-Json | Set-Content -Path (Join-Path -Path $Script:RootPath -ChildPath "ModuleMappings.json")
 $Script:CsprojMappings | Format-Json | Set-Content -Path (Join-Path -Path $Script:RootPath -ChildPath "CsprojMappings.json")
