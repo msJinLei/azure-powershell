@@ -30,9 +30,11 @@ function Get-PreloadAssemblies{
         $preloadFolderName = "PreloadAssemblies"
     }
     $preloadFolder = [System.IO.Path]::Combine($ModuleFolder, $preloadFolderName)
+    Write-Output ("preloadFolder:" + $preloadFolder)
     if(Test-Path $preloadFolder){
         $preloadAssemblies = (Get-ChildItem $preloadFolder -Filter "*.dll").Name | ForEach-Object { $_ -replace ".dll", ""}
     }
+    Write-Output ("preloadAssemblies:" + $preloadAssemblies)
     $preloadAssemblies
 }
 
@@ -60,10 +62,12 @@ foreach ($ModuleManifest in $ModuleManifestFiles) {
         $LoadedAssemblies += $ModuleMetadata.RequiredAssemblies
     }
 
-    $LoadedAssemblies += Get-PreloadAssemblies $ModuleManifest.Directory
-    Write-Output ("------------------------------------\nLoadedAssemblies:" + $LoadedAssemblies)
+    $preload = Get-PreloadAssemblies $ModuleManifest.Directory
+    Write-Output ("------------------------------------`r`n" + $preload)
+    Write-Output ("------------------------------------")
+
+    $LoadedAssemblies += $preload 
     $LoadedAssemblies += $ModuleMetadata.NestedModules
-    Write-Output ("------------------------------------\nLoadedAssemblies:" + $LoadedAssemblies)
 
     if ($ModuleMetadata.RequiredModules) {
         $RequiredModules = $ModuleMetadata.RequiredModules | ForEach-Object { $_["ModuleName"] }
@@ -83,7 +87,10 @@ foreach ($ModuleManifest in $ModuleManifestFiles) {
                 }
                 $LoadedAssemblies += $ModuleMetadata.NestedModules
             }
-            $LoadedAssemblies += Get-PreloadAssemblies $RequiredModuleManifest.Directory
+            $preload = Get-PreloadAssemblies $RequiredModuleManifest.Directory
+            Write-Output ("------------------------------------`r`n" + $preload)
+            Write-Output ("------------------------------------")
+            $LoadedAssemblies += $preload 
         }
     }
 
