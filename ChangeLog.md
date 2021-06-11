@@ -127,7 +127,6 @@
 * @Srihsu, Update Split-AzReservation.md (#15049)
 * @srozemuller, typo in examples resourcegroup parameter (#15146)
 
-
 ## 6.0.0 - May 2021
 Az 6.0.0 (Az.Accounts 2.3.0) is only supported on Windows PowerShell 5.1, PowerShell 7.0 version 7.0.6 or greater and PowerShell 7.1 version 7.1.3 or greater, open https://aka.ms/install-powershell to learn how to upgrade. For further information, go to http://aka.ms/azpslifecyle.
 
