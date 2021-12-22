@@ -19,6 +19,7 @@
 -->
 
 ## Upcoming Release
+* Fixed the bug of cmdlet fails when -DefaultProfile is set to service principal login context. [#16617]
 * Enabled Continue Access Evaluation for MSGraph
 * Improved error message when login is blocked by AAD
 * Improved error message when silent reauthentication failed
