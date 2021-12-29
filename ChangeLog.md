@@ -1,4 +1,3 @@
-## 7.0.0 - December 2021
 #### Az.Accounts
 * Removed 'ServicePrincipalSecret' and 'CertificatePassword' in 'PSAzureRmAccount' [#15427]
 * Added optional parameter 'MicrosoftGraphAccessToken' to 'Connect-AzAccount'
