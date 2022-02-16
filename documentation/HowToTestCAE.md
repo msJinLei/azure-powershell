@@ -15,7 +15,7 @@
   - https://portal.azure.com/#blade/Microsoft_AAD_IAM/ConditionalAccessBlade/Policies
 - Set $DebugPreference = 'Continue'
 
-#### Test case 1
+#### Test case 1: Session Revocation
 - Connect-AzAccounts using the test account
 - Check Access Token and MSGraph Token
   - Get-AzAccessToken AT0
@@ -42,7 +42,7 @@
   - Get-AzAccessToken -ResourceTypeName "MSGraph"
     - GraphAT0 is updated to GraphAT1
 
-#### Test case 2
+#### Test case 2: User location change
 - Connect-AzAccounts using the test account of the allowed ip
 - Check Access Token and MSGraph Token
   - Get-AzAccessToken AT0
@@ -64,3 +64,21 @@
     - Response is 200
   - Get-AzAccessToken -ResourceTypeName "MSGraph"
     - AT0 is not upated
+
+#### Test case 3: MFA enabled
+- Connect account when no MFA enabled for the test account
+- Retrieve data using access token and MSGraph access token
+  - succedd
+- Enable MFA policy
+- Retrieve data using access token and MSGraph access token
+  - failed
+- Reconnect account
+- Retrieve data using access token and MSGraph access token
+  - succeed
+
+#### Test case 4: Run ARM cmdlets from handle-writting modules
+
+#### Test case 5: Run ARM cmdlets from auto generated modules
+
+#### Test case 6: Run data plan cmdlets from auto generated modules (MSGraph cmdlets)
+
