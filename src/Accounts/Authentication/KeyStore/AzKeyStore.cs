@@ -20,6 +20,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security;
 
+using System.Runtime.InteropServices;
+using System.Management.Automation;
+
 namespace Microsoft.Azure.Commands.ResourceManager.Common
 {
     public class AzKeyStore : IDisposable
@@ -30,18 +33,94 @@ namespace Microsoft.Azure.Commands.ResourceManager.Common
         [Obsolete("The constructor is deprecated. Will read key from encryted storage later.", false)]
         public AzKeyStore(IAzureContextContainer profile)
         {
+            ImportProfile(profile);
+        }
+
+        public void ImportProfile(IAzureContextContainer profile)
+        {
             if (profile != null && profile.Accounts != null)
             {
                 foreach (var account in profile.Accounts)
                 {
-                    if (account != null && account.ExtendedProperties.ContainsKey(AzureAccount.Property.ServicePrincipalSecret))
+                    if (account != null)
                     {
-                        IKeyStoreKey keyStoreKey = new ServicePrincipalKey(AzureAccount.Property.ServicePrincipalSecret, account.Id
-                            , account.GetTenants().FirstOrDefault());
-                        var servicePrincipalSecret = account.ExtendedProperties[AzureAccount.Property.ServicePrincipalSecret];
-                        _credentials[keyStoreKey] = servicePrincipalSecret.ConvertToSecureString();
+                        if (account.ExtendedProperties.ContainsKey(AzureAccount.Property.ServicePrincipalSecret))
+                        {
+                            IKeyStoreKey keyStoreKey = new ServicePrincipalKey(AzureAccount.Property.ServicePrincipalSecret, account.Id
+                                , account.GetTenants().FirstOrDefault());
+                            var servicePrincipalSecret = account.GetProperty(AzureAccount.Property.ServicePrincipalSecret);
+                            _credentials[keyStoreKey] = servicePrincipalSecret.ConvertToSecureString();
+                        }
+                        if (account.ExtendedProperties.ContainsKey(AzureAccount.Property.CertificatePassword))
+                        {
+                            IKeyStoreKey keyStoreKey = new ServicePrincipalKey(AzureAccount.Property.CertificatePassword, account.Id
+                                , account.GetTenants().FirstOrDefault());
+                            var certificatePassword = account.GetProperty(AzureAccount.Property.CertificatePassword);
+                            _credentials[keyStoreKey] = certificatePassword.ConvertToSecureString();
+                        }
                     }
                 }
+            }
+        }
+
+        public AzKeyStore(string directory, string fileName, IAzureContextContainer profile)
+        {
+            //fixme
+            try
+            {
+                try
+                {
+                    var storageProperties = new StorageCreationPropertiesBuilder(fileName, directory)
+                        .WithMacKeyChain(KeyChainServiceName + ".other_secrets", KeyChainAccountName)
+                        .WithLinuxKeyring(LinuxKeyRingSchema, LinuxKeyRingCollection, LinuxKeyRingLabel, LinuxKeyRingAttr1,
+                               new KeyValuePair<string, string>("other_secrets", "secret_description"));
+                    _storage = Storage.Create(storageProperties.Build());
+                    _storage.VerifyPersistence();
+                }
+                catch (Exception e)
+                {
+                    if (!RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+                    {
+                        //should not happen: _storage = null;
+                        throw new PSInvalidOperationException(e.Message);
+                    }
+                    var storageProperties = new StorageCreationPropertiesBuilder(fileName, directory).WithMacKeyChain(KeyChainServiceName + ".other_secrets", KeyChainAccountName)
+                        .WithUnprotectedFile();
+                    _storage = Storage.Create(storageProperties.Build());
+                    _storage.VerifyPersistence();
+                }
+            }
+            catch (Exception e)
+            {
+                _storage = null;
+            }
+
+            ImportProfile(profile);
+
+            try
+            {
+                var data = _storage.ReadData();
+                if (data != null && data.Length > 0)
+                {
+                    var rawJsonString = Encoding.UTF8.GetString(data);
+                    var serializableKeyStore = JsonConvert.DeserializeObject(rawJsonString, typeof(List<KeyStoreElement>)) as List<KeyStoreElement>;
+                    if (serializableKeyStore != null)
+                    {
+                        foreach (var item in serializableKeyStore)
+                        {
+                            Type type = Type.GetType(item.keyType);
+                            IKeyStoreKey keyStoreKey = JsonConvert.DeserializeObject(item.keyStoreKey, type) as IKeyStoreKey;
+                            if (keyStoreKey != null)
+                            {
+                                _credentials[keyStoreKey] = ConvertToSecureString(item.secret);
+                            }
+                        }
+                    }
+                }
+            }
+            catch
+            {
+
             }
         }
 

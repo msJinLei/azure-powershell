@@ -719,10 +719,25 @@ namespace Microsoft.Azure.Commands.Profile
                     autoSaveEnabled = false;
                 }
 
-#pragma warning disable CS0618 // Type or member is obsolete
-                var keyStore = new AzKeyStore(AzureRmProfileProvider.Instance.Profile);
-#pragma warning restore CS0618 // Type or member is obsolete
+                //fixme: use variable for keystore file name
+                var keyStore = new AzKeyStore(AzureSession.Instance.ProfileDirectory, "AzKeyStore.cache", AzureRmProfileProvider.Instance.Profile);
                 AzureSession.Instance.RegisterComponent(AzKeyStore.Name, () => keyStore);
+
+                //fixme: extract a function
+                foreach(var account in AzureRmProfileProvider.Instance.Profile.Accounts)
+                {
+                    if (account != null)
+                    {
+                        if (account.ExtendedProperties.ContainsKey(AzureAccount.Property.ServicePrincipalSecret))
+                        {
+                            account.ExtendedProperties.Remove(AzureAccount.Property.ServicePrincipalSecret);
+                        }
+                        if (account.ExtendedProperties.ContainsKey(AzureAccount.Property.CertificatePassword))
+                        {
+                            account.ExtendedProperties.Remove(AzureAccount.Property.CertificatePassword);
+                        }
+                    }
+                }
 
                 IAuthenticatorBuilder builder = null;
                 if (!AzureSession.Instance.TryGetComponent(AuthenticatorBuilder.AuthenticatorBuilderKey, out builder))

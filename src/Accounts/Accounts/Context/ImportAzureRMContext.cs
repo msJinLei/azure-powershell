@@ -80,12 +80,14 @@ namespace Microsoft.Azure.Commands.Profile
                         {
                             keyStore.SaveKey(new ServicePrincipalKey(AzureAccount.Property.ServicePrincipalSecret, account.Id, context.Value.Tenant?.Id)
                                 , secret.ConvertToSecureString());
+                            account.ExtendedProperties.Remove(AzureAccount.Property.ServicePrincipalSecret);
                         }
                         var password = account.GetProperty(AzureAccount.Property.CertificatePassword);
                         if (!string.IsNullOrEmpty(password))
                         {
                             keyStore.SaveKey(new ServicePrincipalKey(AzureAccount.Property.CertificatePassword, account.Id, context.Value.Tenant?.Id)
                                 ,password.ConvertToSecureString());
+                            account.ExtendedProperties.Remove(AzureAccount.Property.CertificatePassword);
                         }
                     }
                 }
