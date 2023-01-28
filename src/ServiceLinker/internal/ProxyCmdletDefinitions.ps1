@@ -1163,6 +1163,7 @@ INPUTOBJECT <IServiceLinkerIdentity>: Identity Parameter
   [ResourceUri <String>]: The fully qualified Azure Resource manager identifier of the resource to be connected.
   [SubscriptionId <String>]: The ID of the target subscription.
 .Link
+<<<<<<< HEAD
 https://learn.microsoft.com/powershell/module/az.servicelinker/remove-azservicelinkerdryrun
 #>
 function Remove-AzServiceLinkerDryrun {
@@ -1314,6 +1315,8 @@ INPUTOBJECT <IServiceLinkerIdentity>: Identity Parameter
   [ResourceUri <String>]: The fully qualified Azure Resource manager identifier of the resource to be connected.
   [SubscriptionId <String>]: The ID of the target subscription.
 .Link
+=======
+>>>>>>> 2ab0409d2b (unexpected modifications)
 https://learn.microsoft.com/powershell/module/az.servicelinker/remove-azservicelinker
 #>
 function Remove-AzServiceLinker {
