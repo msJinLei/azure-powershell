@@ -176,7 +176,7 @@ Get-AzServiceLinkerConfigurationForContainerApp -ContainerApp servicelinker-cont
 .Outputs
 Microsoft.Azure.PowerShell.Cmdlets.ServiceLinker.Models.Api20221101Preview.ISourceConfiguration
 .Link
-https://learn.microsoft.com/powershell/module/az.servicelinker/get-azservicelinkerconfigurationforcontainerapp
+https://docs.microsoft.com/powershell/module/az.servicelinker/get-azservicelinkerconfigurationforcontainerapp
 #>
 function Get-AzServiceLinkerConfigurationForContainerApp {
 [OutputType([Microsoft.Azure.PowerShell.Cmdlets.ServiceLinker.Models.Api20221101Preview.ISourceConfiguration])]
@@ -350,7 +350,7 @@ Get-AzServiceLinkerConfigurationForSpringCloud -ServiceName servicelinker-spring
 .Outputs
 Microsoft.Azure.PowerShell.Cmdlets.ServiceLinker.Models.Api20221101Preview.ISourceConfiguration
 .Link
-https://learn.microsoft.com/powershell/module/az.servicelinker/get-azservicelinkerconfigurationforspringcloud
+https://docs.microsoft.com/powershell/module/az.servicelinker/get-azservicelinkerconfigurationforspringcloud
 #>
 function Get-AzServiceLinkerConfigurationForSpringCloud {
 [OutputType([Microsoft.Azure.PowerShell.Cmdlets.ServiceLinker.Models.Api20221101Preview.ISourceConfiguration])]
@@ -540,7 +540,7 @@ Get-AzServiceLinkerConfigurationForWebApp -WebApp servicelinker-webapp -Resource
 .Outputs
 Microsoft.Azure.PowerShell.Cmdlets.ServiceLinker.Models.Api20221101Preview.ISourceConfiguration
 .Link
-https://learn.microsoft.com/powershell/module/az.servicelinker/get-azservicelinkerconfigurationforwebapp
+https://docs.microsoft.com/powershell/module/az.servicelinker/get-azservicelinkerconfigurationforwebapp
 #>
 function Get-AzServiceLinkerConfigurationForWebApp {
 [OutputType([Microsoft.Azure.PowerShell.Cmdlets.ServiceLinker.Models.Api20221101Preview.ISourceConfiguration])]
@@ -738,7 +738,7 @@ INPUTOBJECT <IServiceLinkerIdentity>: Identity Parameter
   [ResourceUri <String>]: The fully qualified Azure Resource manager identifier of the resource to be connected.
   [SubscriptionId <String>]: The ID of the target subscription.
 .Link
-https://learn.microsoft.com/powershell/module/az.servicelinker/get-azservicelinkerforcontainerapp
+https://docs.microsoft.com/powershell/module/az.servicelinker/get-azservicelinkerforcontainerapp
 #>
 function Get-AzServiceLinkerForContainerApp {
 [OutputType([Microsoft.Azure.PowerShell.Cmdlets.ServiceLinker.Models.Api20221101Preview.ILinkerResource])]
@@ -949,7 +949,7 @@ INPUTOBJECT <IServiceLinkerIdentity>: Identity Parameter
   [ResourceUri <String>]: The fully qualified Azure Resource manager identifier of the resource to be connected.
   [SubscriptionId <String>]: The ID of the target subscription.
 .Link
-https://learn.microsoft.com/powershell/module/az.servicelinker/get-azservicelinkerforspringcloud
+https://docs.microsoft.com/powershell/module/az.servicelinker/get-azservicelinkerforspringcloud
 #>
 function Get-AzServiceLinkerForSpringCloud {
 [OutputType([Microsoft.Azure.PowerShell.Cmdlets.ServiceLinker.Models.Api20221101Preview.ILinkerResource])]
@@ -1178,7 +1178,7 @@ INPUTOBJECT <IServiceLinkerIdentity>: Identity Parameter
   [ResourceUri <String>]: The fully qualified Azure Resource manager identifier of the resource to be connected.
   [SubscriptionId <String>]: The ID of the target subscription.
 .Link
-https://learn.microsoft.com/powershell/module/az.servicelinker/get-azservicelinkerforwebapp
+https://docs.microsoft.com/powershell/module/az.servicelinker/get-azservicelinkerforwebapp
 #>
 function Get-AzServiceLinkerForWebApp {
 [OutputType([Microsoft.Azure.PowerShell.Cmdlets.ServiceLinker.Models.Api20221101Preview.ILinkerResource])]
@@ -1365,7 +1365,7 @@ New-AzServiceLinkerAzureResourceObject -Id /subscriptions/00000000-0000-0000-000
 .Outputs
 Microsoft.Azure.PowerShell.Cmdlets.ServiceLinker.Models.Api20221101Preview.AzureResource
 .Link
-https://learn.microsoft.com/powershell/module/az.ServiceLinker/new-azservicelinkerazureresourceobject
+https://docs.microsoft.com/powershell/module/az.ServiceLinker/new-azservicelinkerazureresourceobject
 #>
 function New-AzServiceLinkerAzureResourceObject {
 [OutputType([Microsoft.Azure.PowerShell.Cmdlets.ServiceLinker.Models.Api20221101Preview.AzureResource])]
@@ -1481,7 +1481,7 @@ New-AzServiceLinkerConfluentBootstrapServerObject -Endpoint "pkc-xxxx.eastus.azu
 .Outputs
 Microsoft.Azure.PowerShell.Cmdlets.ServiceLinker.Models.Api20221101Preview.ConfluentBootstrapServer
 .Link
-https://learn.microsoft.com/powershell/module/az.ServiceLinker/new-azservicelinkerconfluentbootstrapserverobject
+https://docs.microsoft.com/powershell/module/az.ServiceLinker/new-azservicelinkerconfluentbootstrapserverobject
 #>
 function New-AzServiceLinkerConfluentBootstrapServerObject {
 [OutputType([Microsoft.Azure.PowerShell.Cmdlets.ServiceLinker.Models.Api20221101Preview.ConfluentBootstrapServer])]
@@ -1590,7 +1590,7 @@ New-AzServiceLinkerConfluentSchemaRegistryObject -Endpoint "https://psrc-xxxx.we
 .Outputs
 Microsoft.Azure.PowerShell.Cmdlets.ServiceLinker.Models.Api20221101Preview.ConfluentSchemaRegistry
 .Link
-https://learn.microsoft.com/powershell/module/az.ServiceLinker/new-azservicelinkerconfluentschemaregistryobject
+https://docs.microsoft.com/powershell/module/az.ServiceLinker/new-azservicelinkerconfluentschemaregistryobject
 #>
 function New-AzServiceLinkerConfluentSchemaRegistryObject {
 [OutputType([Microsoft.Azure.PowerShell.Cmdlets.ServiceLinker.Models.Api20221101Preview.ConfluentSchemaRegistry])]
@@ -1713,7 +1713,7 @@ AUTHINFO <IAuthInfoBase>: The authentication type.
 TARGETSERVICE <ITargetServiceBase>: The target service properties
   Type <TargetServiceType>: The target service type.
 .Link
-https://learn.microsoft.com/powershell/module/az.servicelinker/new-azservicelinkerforcontainerapp
+https://docs.microsoft.com/powershell/module/az.servicelinker/new-azservicelinkerforcontainerapp
 #>
 function New-AzServiceLinkerForContainerApp {
 [OutputType([Microsoft.Azure.PowerShell.Cmdlets.ServiceLinker.Models.Api20221101Preview.ILinkerResource])]
@@ -2037,7 +2037,7 @@ AUTHINFO <IAuthInfoBase>: The authentication type.
 TARGETSERVICE <ITargetServiceBase>: The target service properties
   Type <TargetServiceType>: The target service type.
 .Link
-https://learn.microsoft.com/powershell/module/az.servicelinker/new-azservicelinkerforspringcloud
+https://docs.microsoft.com/powershell/module/az.servicelinker/new-azservicelinkerforspringcloud
 #>
 function New-AzServiceLinkerForSpringCloud {
 [OutputType([Microsoft.Azure.PowerShell.Cmdlets.ServiceLinker.Models.Api20221101Preview.ILinkerResource])]
@@ -2375,7 +2375,7 @@ AUTHINFO <IAuthInfoBase>: The authentication type.
 TARGETSERVICE <ITargetServiceBase>: The target service properties
   Type <TargetServiceType>: The target service type.
 .Link
-https://learn.microsoft.com/powershell/module/az.servicelinker/new-azservicelinkerforwebapp
+https://docs.microsoft.com/powershell/module/az.servicelinker/new-azservicelinkerforwebapp
 #>
 function New-AzServiceLinkerForWebApp {
 [OutputType([Microsoft.Azure.PowerShell.Cmdlets.ServiceLinker.Models.Api20221101Preview.ILinkerResource])]
@@ -2688,7 +2688,7 @@ New-AzServiceLinkerSecretAuthInfoObject -Name user -SecretNameInKeyVault test-se
 .Outputs
 Microsoft.Azure.PowerShell.Cmdlets.ServiceLinker.Models.Api20221101Preview.SecretAuthInfo
 .Link
-https://learn.microsoft.com/powershell/module/az.ServiceLinker/new-azservicelinkersecretauthinfoobject
+https://docs.microsoft.com/powershell/module/az.ServiceLinker/new-azservicelinkersecretauthinfoobject
 #>
 function New-AzServiceLinkerSecretAuthInfoObject {
 [OutputType([Microsoft.Azure.PowerShell.Cmdlets.ServiceLinker.Models.Api20221101Preview.SecretAuthInfo])]
@@ -2822,7 +2822,7 @@ New-AzServiceLinkerServicePrincipalSecretAuthInfoObject -ClientId 00000000-0000-
 .Outputs
 Microsoft.Azure.PowerShell.Cmdlets.ServiceLinker.Models.Api20221101Preview.ServicePrincipalSecretAuthInfo
 .Link
-https://learn.microsoft.com/powershell/module/az.ServiceLinker/new-azservicelinkerserviceprincipalsecretauthinfoobject
+https://docs.microsoft.com/powershell/module/az.ServiceLinker/new-azservicelinkerserviceprincipalsecretauthinfoobject
 #>
 function New-AzServiceLinkerServicePrincipalSecretAuthInfoObject {
 [OutputType([Microsoft.Azure.PowerShell.Cmdlets.ServiceLinker.Models.Api20221101Preview.ServicePrincipalSecretAuthInfo])]
@@ -2943,7 +2943,7 @@ New-AzServiceLinkerSystemAssignedIdentityAuthInfoObject
 .Outputs
 Microsoft.Azure.PowerShell.Cmdlets.ServiceLinker.Models.Api20221101Preview.SystemAssignedIdentityAuthInfo
 .Link
-https://learn.microsoft.com/powershell/module/az.ServiceLinker/new-azservicelinkersystemassignedidentityauthinfoobject
+https://docs.microsoft.com/powershell/module/az.ServiceLinker/new-azservicelinkersystemassignedidentityauthinfoobject
 #>
 function New-AzServiceLinkerSystemAssignedIdentityAuthInfoObject {
 [OutputType([Microsoft.Azure.PowerShell.Cmdlets.ServiceLinker.Models.Api20221101Preview.SystemAssignedIdentityAuthInfo])]
@@ -3046,7 +3046,7 @@ New-AzServiceLinkerUserAssignedIdentityAuthInfoObject -ClientId 00000000-0000-00
 .Outputs
 Microsoft.Azure.PowerShell.Cmdlets.ServiceLinker.Models.Api20221101Preview.UserAssignedIdentityAuthInfo
 .Link
-https://learn.microsoft.com/powershell/module/az.ServiceLinker/new-azservicelinkeruserassignedidentityauthinfoobject
+https://docs.microsoft.com/powershell/module/az.ServiceLinker/new-azservicelinkeruserassignedidentityauthinfoobject
 #>
 function New-AzServiceLinkerUserAssignedIdentityAuthInfoObject {
 [OutputType([Microsoft.Azure.PowerShell.Cmdlets.ServiceLinker.Models.Api20221101Preview.UserAssignedIdentityAuthInfo])]
@@ -3177,7 +3177,7 @@ INPUTOBJECT <IServiceLinkerIdentity>: Identity Parameter
   [ResourceUri <String>]: The fully qualified Azure Resource manager identifier of the resource to be connected.
   [SubscriptionId <String>]: The ID of the target subscription.
 .Link
-https://learn.microsoft.com/powershell/module/az.servicelinker/remove-azservicelinkerforcontainerapp
+https://docs.microsoft.com/powershell/module/az.servicelinker/remove-azservicelinkerforcontainerapp
 #>
 function Remove-AzServiceLinkerForContainerApp {
 [OutputType([System.Boolean])]
@@ -3394,7 +3394,7 @@ INPUTOBJECT <IServiceLinkerIdentity>: Identity Parameter
   [ResourceUri <String>]: The fully qualified Azure Resource manager identifier of the resource to be connected.
   [SubscriptionId <String>]: The ID of the target subscription.
 .Link
-https://learn.microsoft.com/powershell/module/az.servicelinker/remove-azservicelinkerforspringcloud
+https://docs.microsoft.com/powershell/module/az.servicelinker/remove-azservicelinkerforspringcloud
 #>
 function Remove-AzServiceLinkerForSpringCloud {
 [OutputType([System.Boolean])]
@@ -3627,7 +3627,7 @@ INPUTOBJECT <IServiceLinkerIdentity>: Identity Parameter
   [ResourceUri <String>]: The fully qualified Azure Resource manager identifier of the resource to be connected.
   [SubscriptionId <String>]: The ID of the target subscription.
 .Link
-https://learn.microsoft.com/powershell/module/az.servicelinker/remove-azservicelinkerforwebapp
+https://docs.microsoft.com/powershell/module/az.servicelinker/remove-azservicelinkerforwebapp
 #>
 function Remove-AzServiceLinkerForWebApp {
 [OutputType([System.Boolean])]
@@ -3844,7 +3844,7 @@ INPUTOBJECT <IServiceLinkerIdentity>: Identity Parameter
   [ResourceUri <String>]: The fully qualified Azure Resource manager identifier of the resource to be connected.
   [SubscriptionId <String>]: The ID of the target subscription.
 .Link
-https://learn.microsoft.com/powershell/module/az.servicelinker/test-azservicelinkerforcontainerapp
+https://docs.microsoft.com/powershell/module/az.servicelinker/test-azservicelinkerforcontainerapp
 #>
 function Test-AzServiceLinkerForContainerApp {
 [OutputType([Microsoft.Azure.PowerShell.Cmdlets.ServiceLinker.Models.Api20221101Preview.IValidateResult])]
@@ -4055,7 +4055,7 @@ INPUTOBJECT <IServiceLinkerIdentity>: Identity Parameter
   [ResourceUri <String>]: The fully qualified Azure Resource manager identifier of the resource to be connected.
   [SubscriptionId <String>]: The ID of the target subscription.
 .Link
-https://learn.microsoft.com/powershell/module/az.servicelinker/test-azservicelinkerforspringcloud
+https://docs.microsoft.com/powershell/module/az.servicelinker/test-azservicelinkerforspringcloud
 #>
 function Test-AzServiceLinkerForSpringCloud {
 [OutputType([Microsoft.Azure.PowerShell.Cmdlets.ServiceLinker.Models.Api20221101Preview.IValidateResult])]
@@ -4282,7 +4282,7 @@ INPUTOBJECT <IServiceLinkerIdentity>: Identity Parameter
   [ResourceUri <String>]: The fully qualified Azure Resource manager identifier of the resource to be connected.
   [SubscriptionId <String>]: The ID of the target subscription.
 .Link
-https://learn.microsoft.com/powershell/module/az.servicelinker/test-azservicelinkerforwebapp
+https://docs.microsoft.com/powershell/module/az.servicelinker/test-azservicelinkerforwebapp
 #>
 function Test-AzServiceLinkerForWebApp {
 [OutputType([Microsoft.Azure.PowerShell.Cmdlets.ServiceLinker.Models.Api20221101Preview.IValidateResult])]
@@ -4501,7 +4501,7 @@ INPUTOBJECT <IServiceLinkerIdentity>: Identity Parameter
 TARGETSERVICE <ITargetServiceBase>: The target service properties
   Type <TargetServiceType>: The target service type.
 .Link
-https://learn.microsoft.com/powershell/module/az.servicelinker/update-azservicelinkerforcontainerapp
+https://docs.microsoft.com/powershell/module/az.servicelinker/update-azservicelinkerforcontainerapp
 #>
 function Update-AzServiceLinkerForContainerApp {
 [OutputType([Microsoft.Azure.PowerShell.Cmdlets.ServiceLinker.Models.Api20221101Preview.ILinkerResource])]
@@ -4766,7 +4766,7 @@ INPUTOBJECT <IServiceLinkerIdentity>: Identity Parameter
 TARGETSERVICE <ITargetServiceBase>: The target service properties
   Type <TargetServiceType>: The target service type.
 .Link
-https://learn.microsoft.com/powershell/module/az.servicelinker/update-azservicelinkerforspringcloud
+https://docs.microsoft.com/powershell/module/az.servicelinker/update-azservicelinkerforspringcloud
 #>
 function Update-AzServiceLinkerForSpringCloud {
 [OutputType([Microsoft.Azure.PowerShell.Cmdlets.ServiceLinker.Models.Api20221101Preview.ILinkerResource])]
@@ -5047,7 +5047,7 @@ INPUTOBJECT <IServiceLinkerIdentity>: Identity Parameter
 TARGETSERVICE <ITargetServiceBase>: The target service properties
   Type <TargetServiceType>: The target service type.
 .Link
-https://learn.microsoft.com/powershell/module/az.servicelinker/update-azservicelinkerforwebapp
+https://docs.microsoft.com/powershell/module/az.servicelinker/update-azservicelinkerforwebapp
 #>
 function Update-AzServiceLinkerForWebApp {
 [OutputType([Microsoft.Azure.PowerShell.Cmdlets.ServiceLinker.Models.Api20221101Preview.ILinkerResource])]

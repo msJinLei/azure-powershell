@@ -41,7 +41,7 @@ INPUTOBJECT <IServiceLinkerIdentity>: Identity Parameter
   [ResourceUri <String>]: The fully qualified Azure Resource manager identifier of the resource to be connected.
   [SubscriptionId <String>]: The ID of the target subscription.
 .Link
-https://learn.microsoft.com/powershell/module/az.servicelinker/remove-azservicelinkerforwebapp
+https://docs.microsoft.com/powershell/module/az.servicelinker/remove-azservicelinkerforwebapp
 #>
 function Remove-AzServiceLinkerForWebApp {
 [OutputType([System.Boolean])]

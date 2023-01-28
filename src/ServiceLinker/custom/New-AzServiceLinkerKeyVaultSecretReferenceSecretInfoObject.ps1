@@ -23,7 +23,7 @@ Create an in-memory object for KeyVaultSecretReferenceSecretInfo.
 .Outputs
 Microsoft.Azure.PowerShell.Cmdlets.ServiceLinker.Models.Api20221101Preview.KeyVaultSecretReferenceSecretInfo
 .Link
-https://learn.microsoft.com/powershell/module/az.ServiceLinker/new-azservicelinkerkeyvaultsecretreferencesecretinfoobject
+https://docs.microsoft.com/powershell/module/az.ServiceLinker/new-azservicelinkerkeyvaultsecretreferencesecretinfoobject
 #>
 function New-AzServiceLinkerKeyVaultSecretReferenceSecretInfoObject {
     [Microsoft.Azure.PowerShell.Cmdlets.ServiceLinker.DoNotExportAttribute()]

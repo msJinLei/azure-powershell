@@ -49,7 +49,7 @@ INPUTOBJECT <IServiceLinkerIdentity>: Identity Parameter
   [ResourceUri <String>]: The fully qualified Azure Resource manager identifier of the resource to be connected.
   [SubscriptionId <String>]: The ID of the target subscription.
 .Link
-https://learn.microsoft.com/powershell/module/az.servicelinker/get-azservicelinkerforcontainerapp
+https://docs.microsoft.com/powershell/module/az.servicelinker/get-azservicelinkerforcontainerapp
 #>
 function Get-AzServiceLinkerForContainerApp {
 [OutputType([Microsoft.Azure.PowerShell.Cmdlets.ServiceLinker.Models.Api20221101Preview.ILinkerResource])]
