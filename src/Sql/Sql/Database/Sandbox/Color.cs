@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Microsoft.Azure.Commands.Sql.View
+namespace Microsoft.Azure.Commands.Sql.Database.Sandbox
 { 
     public class Color : IEquatable<Color>
     {

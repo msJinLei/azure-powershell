@@ -17,7 +17,7 @@ using Microsoft.Azure.PowerShell.Cmdlets.Sql.Helpers.Resources.Models;
 using System.Collections.Generic;
 
 
-namespace Microsoft.Azure.Commands.Sql.Database.Services
+namespace Microsoft.Azure.Commands.Sql.Database.Sandbox
 {
     internal class TemplateValidationInfo
     {

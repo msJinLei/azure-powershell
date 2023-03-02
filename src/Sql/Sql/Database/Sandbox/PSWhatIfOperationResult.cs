@@ -18,10 +18,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Microsoft.Azure.Commands.Sql.Database.Services
+namespace Microsoft.Azure.Commands.Sql.Database.Sandbox
 {
-
-
     public class PSWhatIfOperationResult
     {
         private readonly WhatIfOperationResult whatIfOperationResult;

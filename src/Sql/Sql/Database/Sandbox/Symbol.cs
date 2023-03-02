@@ -12,7 +12,7 @@
 // limitations under the License.
 // ----------------------------------------------------------------------------------
 
-namespace Microsoft.Azure.Commands.Sql.View
+namespace Microsoft.Azure.Commands.Sql.Database.Sandbox
 {
     public class Symbol
     {

@@ -21,6 +21,8 @@ using Microsoft.WindowsAzure.Commands.Utilities.Common;
 using Microsoft.Azure.PowerShell.Cmdlets.Sql.Resources.Extensions;
 using Microsoft.Azure.Management.Internal.Resources.Utilities.Models;
 
+using Microsoft.Azure.Commands.Sql.Database.Sandbox;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -36,6 +38,8 @@ namespace Microsoft.Azure.Commands.Sql.Database.Services
     {
         private IResourceManagementClient ResourceManagementClient = null;
         private List<DeploymentOperation> operations;
+        private string resourceGroupName = null;
+        private string deploymentName = null;
 
         public Action<string> ErrorLogger { get; set; }
         public Action<string> WarningLogger { get; set; }
@@ -43,7 +47,7 @@ namespace Microsoft.Azure.Commands.Sql.Database.Services
 
         #region Constants
         public const string ErrorFormat = "Error: Code={0}; Message={1}\r\n";
-        private const string DefaultTemplatePath = "Microsoft.Azure.Commands.KeyVault.Resources.keyvaultTemplate.json";
+        private const string DefaultTemplatePath = "Microsoft.Azure.Commands.Sql.Resources.keyvaultTemplate.json";
         /// <summary>
         /// The deployments resource type.
         /// </summary>
@@ -74,27 +78,28 @@ namespace Microsoft.Azure.Commands.Sql.Database.Services
         }
         #endregion
 
-        public DeploymentClient(IAzureContext context)
+        public DeploymentClient(IAzureContext context, string resourceGroupName, string parameterSetName)
         {
+            this.resourceGroupName = resourceGroupName;
+            this.deploymentName = GenerateDeploymentName(parameterSetName);
             ResourceManagementClient = AzureSession.Instance.ClientFactory.CreateArmClient<ResourceManagementClient>(context, AzureEnvironment.Endpoint.ResourceManager);
         }
 
         #region Deployment-related METHODS
 
-        public void CreateSqlDatabase(string resourceGroupName, string parameterSet, Deployment deployment, AzurePSCmdlet cmdlet = null)
+        public void CreateSqlDatabase(Deployment deployment, AzurePSCmdlet cmdlet = null)
         {
             if (string.IsNullOrWhiteSpace(resourceGroupName))
             {
                 throw new ArgumentNullException("resourceGroupName");
             }
- 
-            string deploymentName = GenerateDeploymentName(parameterSet);
+
             var existed = ResourceManagementClient.Deployments.CheckExistence(resourceGroupName, deploymentName);
 
-            //WriteInfo("Validating KeyVault creation...", cmdlet);
-            this.RunDeploymentValidation(resourceGroupName, deploymentName, deployment, cmdlet);//fixme
-            this.BeginDeployment(deploymentName, resourceGroupName, deployment, cmdlet);
-            var dep = ProvisionDeploymentStatus(deploymentName, resourceGroupName, deployment, cmdlet, existed).ToPSDeployment(resourceGroupName: resourceGroupName);
+            //WriteInfo("Validating Sql Database creation...", cmdlet);
+            RunDeploymentValidation(deployment, cmdlet);//fixme
+            BeginDeployment(deployment, cmdlet);
+            var dep = ProvisionDeploymentStatus(deployment, cmdlet, existed).ToPSDeployment(resourceGroupName: resourceGroupName);
 
             //fixme: use output of the arm template and or get database in cmdlet
         }
@@ -109,9 +114,9 @@ namespace Microsoft.Azure.Commands.Sql.Database.Services
             cmdlet.WriteInformation(information, tags);
         }
 
-        private void WriteDeploymentProgress(string deploymentName, string resourceGroupName, DeploymentOperationErrorInfo deploymentOperationError)
+        private void WriteDeploymentProgress(DeploymentOperationErrorInfo deploymentOperationError)
         {
-            var result = ListDeploymentOperations(resourceGroupName, deploymentName);
+            var result = ListDeploymentOperations();
             var newOperations = GetNewOperations(operations, result);
             operations.AddRange(newOperations);
 
@@ -124,7 +129,7 @@ namespace Microsoft.Azure.Commands.Sql.Database.Services
             }
         }
 
-        public DeploymentExtended ProvisionDeploymentStatus(string deploymentName, string resourceGroupName, Deployment deployment, AzurePSCmdlet cmdlet = null, bool existed = false)
+        public DeploymentExtended ProvisionDeploymentStatus(Deployment deployment, AzurePSCmdlet cmdlet = null, bool existed = false)
         {
             operations = new List<DeploymentOperation>();
             var status = new ProvisioningState[] { ProvisioningState.Canceled, ProvisioningState.Succeeded, ProvisioningState.Failed };
@@ -231,7 +236,7 @@ namespace Microsoft.Azure.Commands.Sql.Database.Services
 
             return newOperations;
         }
-        private IPage<DeploymentOperation> ListDeploymentOperations(string resourceGroupName, string deploymentName)
+        private IPage<DeploymentOperation> ListDeploymentOperations()
         {
             return ResourceManagementClient.DeploymentOperations.List(resourceGroupName, deploymentName, null);
         }
@@ -241,10 +246,10 @@ namespace Microsoft.Azure.Commands.Sql.Database.Services
             //fixme:check whether equivalent
             var resourceGroupName = resourceIdentifier.ResourceGroupName;
             var deploymentName = resourceIdentifier.ResourceType;
-            
+
             if (ResourceManagementClient.Deployments.CheckExistence(resourceGroupName, deploymentName) == true)
             {
-                var result = this.ListDeploymentOperations(resourceGroupName, deploymentName);
+                var result = this.ListDeploymentOperations();
 
                 return GetNewOperations(operations, result);
             }
@@ -260,7 +265,7 @@ namespace Microsoft.Azure.Commands.Sql.Database.Services
             }
         }
 
-        private void BeginDeployment(string deploymentName, string resourceGroupName, Deployment deployment, AzurePSCmdlet cmdlet = null)
+        private void BeginDeployment(Deployment deployment, AzurePSCmdlet cmdlet = null)
         {
             bool threadCompleted = false;
             Action onComplete = () =>
@@ -287,7 +292,7 @@ namespace Microsoft.Azure.Commands.Sql.Database.Services
             }
         }
 
-        private void RunDeploymentValidation(string resourceGroupName, string deploymentName, Deployment deployment, AzurePSCmdlet cmdlet = null)
+        private void RunDeploymentValidation(Deployment deployment, AzurePSCmdlet cmdlet = null)
         {
             TemplateValidationInfo validationResult = null;
             bool threadCompleted = false;
@@ -301,7 +306,7 @@ namespace Microsoft.Azure.Commands.Sql.Database.Services
                 {
                     try
                     {
-                        validationResult = this.GetTemplateValidationResult(resourceGroupName, deploymentName, deployment);
+                        validationResult = this.GetTemplateValidationResult(deployment);
                     }
                     finally
                     {
@@ -335,12 +340,12 @@ namespace Microsoft.Azure.Commands.Sql.Database.Services
             }
         }
 
-        private TemplateValidationInfo GetTemplateValidationResult(string resourceGroupName, string deploymentName, Deployment deployment)
+        private TemplateValidationInfo GetTemplateValidationResult(Deployment deployment)
         {
             try
             {
                 // WriteVerbose("Start validating");
-                var validationResult = this.ValidateDeployment(resourceGroupName, deploymentName, deployment);
+                var validationResult = this.ValidateDeployment(deployment);
                 // WriteVerbose("Got result.");
                 return new TemplateValidationInfo(validationResult);
             }
@@ -374,7 +379,7 @@ namespace Microsoft.Azure.Commands.Sql.Database.Services
 
         }
 
-        private DeploymentValidateResult ValidateDeployment(string resourceGroupName, string deploymentName, Deployment deployment)
+        private DeploymentValidateResult ValidateDeployment(Deployment deployment)
         {
             return ResourceManagementClient.Deployments.BeginValidate(resourceGroupName, deploymentName, deployment);
         }
@@ -402,27 +407,25 @@ namespace Microsoft.Azure.Commands.Sql.Database.Services
         /// <summary>
         /// Executes deployment What-If at the specified scope.
         /// </summary>
-        /// <param name="parameters"></param>
-        /// <param name="kvParameters"></param>
-        /// <param name="networkRuleSet"></param>
+        /// <param name="deploymentWhatIf"></param>
         /// <returns></returns>
-        public virtual PSWhatIfOperationResult ExecuteDeploymentWhatIf(PSDeploymentWhatIfCmdletParameters parameters, VaultCreationOrUpdateParameters kvParameters, PSKeyVaultNetworkRuleSet networkRuleSet = null)
+        public virtual PSWhatIfOperationResult ExecuteDeploymentWhatIf(DeploymentWhatIf deploymentWhatIf)
         {
             IDeploymentsOperations deployments = this.ResourceManagementClient.Deployments;
-            DeploymentWhatIf deploymentWhatIf = parameters.ToDeploymentWhatIf(parameters, kvParameters, networkRuleSet);
             ScopedDeploymentWhatIf scopedDeploymentWhatIf = new ScopedDeploymentWhatIf(deploymentWhatIf.Location, deploymentWhatIf.Properties);
 
             try
             {
                 WhatIfOperationResult whatIfOperationResult = null;
-                whatIfOperationResult = deployments.WhatIf(parameters.ResourceGroupName, parameters.DeploymentName, deploymentWhatIf.Properties);
+                whatIfOperationResult = deployments.WhatIf(resourceGroupName, deploymentName, deploymentWhatIf.Properties);
 
-               if (parameters.ExcludeChangeTypes != null)
-                {
-                    whatIfOperationResult.Changes = whatIfOperationResult.Changes
-                        .Where(change => parameters.ExcludeChangeTypes.All(changeType => changeType != change.ChangeType))
-                        .ToList();
-                }
+                //fixme: assign values to ExcludeChangeTypes
+                //if (parameters.ExcludeChangeTypes != null)
+                // {
+                //     whatIfOperationResult.Changes = whatIfOperationResult.Changes
+                //         .Where(change => parameters.ExcludeChangeTypes.All(changeType => changeType != change.ChangeType))
+                //         .ToList();
+                // }
 
                 return new PSWhatIfOperationResult(whatIfOperationResult);
             }

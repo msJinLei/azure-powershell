@@ -12,14 +12,11 @@
 // limitations under the License.
 // ----------------------------------------------------------------------------------
 
-// using Microsoft.Azure.Management.Internal.ResourceManager.Version2018_05_01.Models;
 using Microsoft.Azure.PowerShell.Cmdlets.Sql.Helpers.Resources.Models;
-using Microsoft.Azure.Management.Sql.Models;
 using System;
 using System.Collections;
-using System.Collections.Generic;
 
-namespace Microsoft.Azure.Commands.KeyVault.Models
+namespace Microsoft.Azure.Commands.Sql.Database.Sandbox
 {
     public class VaultCreationOrUpdateParameters
     {
@@ -38,10 +35,10 @@ namespace Microsoft.Azure.Commands.KeyVault.Models
         public int? SoftDeleteRetentionInDays { get; set; }
         public string PublicNetworkAccess { get; set; }
         public Guid TenantId { get; set; }
-        public AccessPolicyEntry AccessPolicy { get; set; }
-        public NetworkRuleSet NetworkAcls { get; set; }
-        public MHSMNetworkRuleSet MhsmNetworkAcls { get; set; }
-        public CreateMode? CreateMode { get; set; }
+        //public AccessPolicyEntry AccessPolicy { get; set; }
+        //public NetworkRuleSet NetworkAcls { get; set; }
+        //public MHSMNetworkRuleSet MhsmNetworkAcls { get; set; }
+        //public CreateMode? CreateMode { get; set; }
         public string[] Administrator { get; set; }
         // public string TemplateFile { get; set; }
         public DeploymentMode DeploymentMode { get; set; }

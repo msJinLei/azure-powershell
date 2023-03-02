@@ -1,8 +1,10 @@
 ﻿using Microsoft.Azure.PowerShell.Cmdlets.Sql.Helpers.Resources.Models;
+using Microsoft.Azure.Commands.Sql.Database.Model;
+
 using System;
 using System.Collections.Generic;
 
-namespace Microsoft.Azure.Commands.Sql.View
+namespace Microsoft.Azure.Commands.Sql.Database.Sandbox
 {
     public static class ChangeTypeExtensions
     {

@@ -15,6 +15,7 @@
 using Microsoft.Azure.Commands.ResourceManager.Common.ArgumentCompleters;
 using Microsoft.Azure.Commands.ResourceManager.Common.Tags;
 using Microsoft.Azure.Commands.Sql.Database.Model;
+using Microsoft.Azure.Commands.Sql.Database.Sandbox;
 using Microsoft.Azure.Commands.Sql.Database.Services;
 using Microsoft.Azure.PowerShell.Cmdlets.Sql.Helpers.Resources.Models;
 using Microsoft.Rest.Azure;
@@ -27,6 +28,8 @@ using System.IO;
 using System.Linq;
 using System.Management.Automation;
 using System.Reflection;
+
+using DatabaseReadScale = Microsoft.Azure.Commands.Sql.Database.Model.DatabaseReadScale;
 
 namespace Microsoft.Azure.Commands.Sql.Database.Cmdlet
 {
@@ -269,7 +272,33 @@ namespace Microsoft.Azure.Commands.Sql.Database.Cmdlet
                     WriteWarning(string.Format(CultureInfo.InvariantCulture, Properties.Resources.BackupRedundancyChosenIsGeoWarning));
                 }
             }
-            base.ExecuteCmdlet();
+
+
+
+            if (ShouldProcess("", ""))
+            {
+                var deployment = GetDeployment();
+                TemplateDeploymentClient.CreateSqlDatabase(deployment, this);
+                //fixme: reply DatabaseName, ServerName, ResourceGroupName
+                WriteObject(TransformModelToOutputObject(GetEntity()));
+            }
+            else
+            {
+                string whatIfMessage = null;
+                string warningMessage = null;
+                string captionMessage = null;
+                var deploymentWhatif = GetDeploymentWhatIf();
+                PSWhatIfOperationResult whatIfResult = TemplateDeploymentClient.ExecuteDeploymentWhatIf(deploymentWhatif);
+                string whatIfFormattedOutput = WhatIfOperationResultFormatter.Format(whatIfResult);
+                string cursorUp = $"{(char)27}[1A";
+
+                // Use \r to override the built-in "What if:" in output.
+                whatIfMessage = $"\r        \r{Environment.NewLine}{whatIfFormattedOutput}{Environment.NewLine}";
+                warningMessage = $"{Environment.NewLine}{"ConfirmDeploymentMessage"}";
+                captionMessage = $"{cursorUp}{Color.Reset}{whatIfMessage}";
+                // this.WriteObject(whatIfResult);
+                this.ShouldProcess(whatIfMessage, warningMessage, captionMessage);
+            }
         }
 
         /// <summary>
@@ -386,7 +415,7 @@ namespace Microsoft.Azure.Commands.Sql.Database.Cmdlet
             {
                 if (_client == null)
                 {
-                    _client = new DeploymentClient(DefaultContext);
+                    _client = new DeploymentClient(DefaultContext, ResourceGroupName, ParameterSetName);
                 }
                 return _client;
             }
@@ -410,7 +439,7 @@ namespace Microsoft.Azure.Commands.Sql.Database.Cmdlet
 
         Deployment GetDeployment()
         {
-            const string DefaultTemplatePath = "Microsoft.Azure.Commands.KeyVault.Resources.NewDatabaseNewServerNewElasticPool.json";
+            const string DefaultTemplatePath = "Microsoft.Azure.Commands.Sql.Resources.NewDatabaseNewServerNewElasticPool.json";
             string templateContent = null;
 
             using (var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(DefaultTemplatePath))
@@ -434,7 +463,7 @@ namespace Microsoft.Azure.Commands.Sql.Database.Cmdlet
 
         DeploymentWhatIf GetDeploymentWhatIf()
         {
-            const string DefaultTemplatePath = "Microsoft.Azure.Commands.KeyVault.Resources.NewDatabaseNewServerNewElasticPool.json";
+            const string DefaultTemplatePath = "Microsoft.Azure.Commands.Sql.Resources.NewDatabaseNewServerNewElasticPool.json";
             string templateContent = null;
 
             using (var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(DefaultTemplatePath))
@@ -446,17 +475,14 @@ namespace Microsoft.Azure.Commands.Sql.Database.Cmdlet
             var deploymentWhatIf = new DeploymentWhatIf()
             {
                 Location = Serverlocation,
-                Properties = new DeploymentProperties()
+               
+                Properties = new DeploymentWhatIfProperties()
+                {
+                    Mode = DeploymentMode.Incremental,
+                    WhatIfSettings = new DeploymentWhatIfSettings(WhatIfResultFormat.FullResourcePayloads)
+                }
             };
             return deploymentWhatIf;
-        }
-
-        public override void ExecuteCmdlet()
-        {
-            var deployment = GetDeployment();
-            TemplateDeploymentClient.CreateSqlDatabase(ResourceGroupName, ParameterSetName, deployment, this);
-            //fixme: replay DatabaseName, ServerName, ResourceGroupName
-            WriteObject(TransformModelToOutputObject(GetEntity()));
         }
     }
 }

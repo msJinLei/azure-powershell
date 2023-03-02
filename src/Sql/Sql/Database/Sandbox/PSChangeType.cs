@@ -12,7 +12,7 @@
 // limitations under the License.
 // ----------------------------------------------------------------------------------
 
-namespace Microsoft.Azure.Commands.Sql
+namespace Microsoft.Azure.Commands.Sql.Database.Sandbox
 {
     public enum PSChangeType
     {
