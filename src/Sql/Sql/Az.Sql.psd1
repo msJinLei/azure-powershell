@@ -297,7 +297,7 @@ CmdletsToExport = 'Get-AzSqlDatabaseTransparentDataEncryption',
                'Invoke-AzSqlDatabaseTransparentDataEncryptionProtectorRevalidation',
                'Invoke-AzSqlDatabaseTransparentDataEncryptionProtectorRevert',
                'Invoke-AzSqlServerTransparentDataEncryptionProtectorRevalidation',
-               'Invoke-AzSqlInstanceTransparentDataEncryptionProtectorRevalidation'
+               'Invoke-AzSqlInstanceTransparentDataEncryptionProtectorRevalidation',
                'Deploy-AzSqlDatabase'
 
 # Variables to export from this module

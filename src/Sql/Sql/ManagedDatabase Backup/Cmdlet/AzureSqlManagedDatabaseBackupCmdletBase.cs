@@ -157,7 +157,7 @@ namespace Microsoft.Azure.Commands.Sql.ManagedDatabaseBackup.Cmdlet
             // "/subscriptions/<subId>/resourceGroups/<resourceGroup>/providers/Microsoft.Sql/managedInstances/<managedInstance>/databases/<database>/backupShortTermRetentionPolicies/default"
             if (tokens.Length != BackupShortTermRetentionPolicyResourceIdSegmentsLength)
             {
-                throw new ArgumentException(Resources.InvalidFormatResourceId, "ResourceId");
+                throw new ArgumentException(Properties.Resources.InvalidFormatResourceId, "ResourceId");
             }
 
             // Convert tokens into TYPE:NAME key value pairs, ignoring case
@@ -189,13 +189,13 @@ namespace Microsoft.Azure.Commands.Sql.ManagedDatabaseBackup.Cmdlet
                     }
                     else
                     {
-                        throw new ArgumentException(Resources.InvalidFormatResourceId, "ResourceId");
+                        throw new ArgumentException(Properties.Resources.InvalidFormatResourceId, "ResourceId");
                     }
                 }
             }
             catch (KeyNotFoundException)
             {
-                throw new ArgumentException(Resources.InvalidFormatResourceId, "ResourceId");
+                throw new ArgumentException(Properties.Resources.InvalidFormatResourceId, "ResourceId");
             }
         }
     }

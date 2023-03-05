@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.3.32901.215
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.33328.57
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sql", "Sql\Sql.csproj", "{69ED499E-6F3C-488F-86B8-B74CFDA4D47E}"
 EndProject
@@ -47,6 +47,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sql.Helpers", "Sql.Helpers\Sql.Helpers.csproj", "{2474103E-9F07-4317-8538-B1F49B8DF9D3}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AssemblyLoading", "..\Accounts\AssemblyLoading\AssemblyLoading.csproj", "{1B3202E7-34E8-4D1A-BC0E-1626482E2470}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sql.ResourceManager", "Sql.ResourceManager\Sql.ResourceManager.csproj", "{8EB5DD1A-72D8-4ECC-BA93-EC9F9DDEDE83}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -231,6 +233,14 @@ Global
 		{1B3202E7-34E8-4D1A-BC0E-1626482E2470}.Release|Any CPU.Build.0 = Release|Any CPU
 		{1B3202E7-34E8-4D1A-BC0E-1626482E2470}.Release|x64.ActiveCfg = Release|Any CPU
 		{1B3202E7-34E8-4D1A-BC0E-1626482E2470}.Release|x64.Build.0 = Release|Any CPU
+		{8EB5DD1A-72D8-4ECC-BA93-EC9F9DDEDE83}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8EB5DD1A-72D8-4ECC-BA93-EC9F9DDEDE83}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8EB5DD1A-72D8-4ECC-BA93-EC9F9DDEDE83}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{8EB5DD1A-72D8-4ECC-BA93-EC9F9DDEDE83}.Debug|x64.Build.0 = Debug|Any CPU
+		{8EB5DD1A-72D8-4ECC-BA93-EC9F9DDEDE83}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8EB5DD1A-72D8-4ECC-BA93-EC9F9DDEDE83}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8EB5DD1A-72D8-4ECC-BA93-EC9F9DDEDE83}.Release|x64.ActiveCfg = Release|Any CPU
+		{8EB5DD1A-72D8-4ECC-BA93-EC9F9DDEDE83}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

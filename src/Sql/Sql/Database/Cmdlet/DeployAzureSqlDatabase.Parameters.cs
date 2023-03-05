@@ -23,7 +23,7 @@ namespace Microsoft.Azure.Commands.Sql.Database.Cmdlet
     public partial class DeployAzureSqlDatabase
     {
 
-        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "")]
+        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "Empty help message.")]
         public string Administratorlogin
         {
             get
@@ -37,7 +37,7 @@ namespace Microsoft.Azure.Commands.Sql.Database.Cmdlet
         }
 
 
-        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "")]
+        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "Empty help message.")]
         public SecureString Administratorloginpassword
         {
             get
@@ -51,7 +51,7 @@ namespace Microsoft.Azure.Commands.Sql.Database.Cmdlet
         }
 
 
-        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "")]
+        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "Empty help message.")]
         public object Administrators
         {
             get
@@ -65,7 +65,7 @@ namespace Microsoft.Azure.Commands.Sql.Database.Cmdlet
         }
 
 
-        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "")]
+        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "Empty help message.")]
         public string Collation
         {
             get
@@ -78,22 +78,7 @@ namespace Microsoft.Azure.Commands.Sql.Database.Cmdlet
             }
         }
 
-
-        [Parameter(Mandatory = true, HelpMessage = "")]
-        public string Databasename
-        {
-            get
-            {
-                return (string)GetTemplateParameterValue("databaseName");
-            }
-            set
-            {
-                CreateTemplateParameterValue("databaseName", value);
-            }
-        }
-
-
-        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "")]
+        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "Empty help message.")]
         public string Skuname
         {
             get
@@ -107,7 +92,7 @@ namespace Microsoft.Azure.Commands.Sql.Database.Cmdlet
         }
 
 
-        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "")]
+        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "Empty help message.")]
         public string Tier
         {
             get
@@ -121,7 +106,7 @@ namespace Microsoft.Azure.Commands.Sql.Database.Cmdlet
         }
 
 
-        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "")]
+        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "Empty help message.")]
         public string Poollimit
         {
             get
@@ -135,7 +120,7 @@ namespace Microsoft.Azure.Commands.Sql.Database.Cmdlet
         }
 
 
-        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "")]
+        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "Empty help message.")]
         public int Poolsize
         {
             get
@@ -149,7 +134,7 @@ namespace Microsoft.Azure.Commands.Sql.Database.Cmdlet
         }
 
 
-        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "")]
+        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "Empty help message.")]
         public string Perdatabaseperformancemin
         {
             get
@@ -163,7 +148,7 @@ namespace Microsoft.Azure.Commands.Sql.Database.Cmdlet
         }
 
 
-        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "")]
+        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "Empty help message.")]
         public string Perdatabaseperformancemax
         {
             get
@@ -177,7 +162,7 @@ namespace Microsoft.Azure.Commands.Sql.Database.Cmdlet
         }
 
 
-        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "")]
+        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "Empty help message.")]
         public string Serverlocation
         {
             get
@@ -190,22 +175,7 @@ namespace Microsoft.Azure.Commands.Sql.Database.Cmdlet
             }
         }
 
-
-        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "")]
-        public string Servername
-        {
-            get
-            {
-                return (string)GetTemplateParameterValue("serverName");
-            }
-            set
-            {
-                CreateTemplateParameterValue("serverName", value);
-            }
-        }
-
-
-        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "")]
+        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "Empty help message.")]
         public string Elasticpoolname
         {
             get
@@ -219,7 +189,7 @@ namespace Microsoft.Azure.Commands.Sql.Database.Cmdlet
         }
 
 
-        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "")]
+        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "Empty help message.")]
         public string Samplename
         {
             get
@@ -233,7 +203,7 @@ namespace Microsoft.Azure.Commands.Sql.Database.Cmdlet
         }
 
 
-        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "")]
+        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "Empty help message.")]
         public bool Zoneredundant
         {
             get
@@ -247,7 +217,7 @@ namespace Microsoft.Azure.Commands.Sql.Database.Cmdlet
         }
 
 
-        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "")]
+        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "Empty help message.")]
         public string Licensetype
         {
             get
@@ -261,7 +231,7 @@ namespace Microsoft.Azure.Commands.Sql.Database.Cmdlet
         }
 
 
-        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "")]
+        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "Empty help message.")]
         public bool Enableads
         {
             get
@@ -275,7 +245,7 @@ namespace Microsoft.Azure.Commands.Sql.Database.Cmdlet
         }
 
 
-        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "")]
+        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "Empty help message.")]
         public bool Allowazureips
         {
             get
@@ -289,7 +259,7 @@ namespace Microsoft.Azure.Commands.Sql.Database.Cmdlet
         }
 
 
-        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "")]
+        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "Empty help message.")]
         public object Databasetags
         {
             get
@@ -303,7 +273,7 @@ namespace Microsoft.Azure.Commands.Sql.Database.Cmdlet
         }
 
 
-        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "")]
+        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "Empty help message.")]
         public object Servertags
         {
             get
@@ -317,7 +287,7 @@ namespace Microsoft.Azure.Commands.Sql.Database.Cmdlet
         }
 
 
-        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "")]
+        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "Empty help message.")]
         public object Elasticpooltags
         {
             get
@@ -331,7 +301,7 @@ namespace Microsoft.Azure.Commands.Sql.Database.Cmdlet
         }
 
 
-        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "")]
+        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "Empty help message.")]
         public bool Enableva
         {
             get
@@ -373,7 +343,7 @@ namespace Microsoft.Azure.Commands.Sql.Database.Cmdlet
         }
 
 
-        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "")]
+        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "Empty help message.")]
         public bool Enableprivateendpoint
         {
             get
@@ -387,7 +357,7 @@ namespace Microsoft.Azure.Commands.Sql.Database.Cmdlet
         }
 
 
-        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "")]
+        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "Empty help message.")]
         public string Privateendpointnestedtemplateid
         {
             get
@@ -401,7 +371,7 @@ namespace Microsoft.Azure.Commands.Sql.Database.Cmdlet
         }
 
 
-        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "")]
+        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "Empty help message.")]
         public string Privateendpointsubscriptionid
         {
             get
@@ -415,7 +385,7 @@ namespace Microsoft.Azure.Commands.Sql.Database.Cmdlet
         }
 
 
-        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "")]
+        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "Empty help message.")]
         public string Privateendpointresourcegroup
         {
             get
@@ -429,7 +399,7 @@ namespace Microsoft.Azure.Commands.Sql.Database.Cmdlet
         }
 
 
-        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "")]
+        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "Empty help message.")]
         public string Privateendpointname
         {
             get
@@ -443,7 +413,7 @@ namespace Microsoft.Azure.Commands.Sql.Database.Cmdlet
         }
 
 
-        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "")]
+        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "Empty help message.")]
         public string Privateendpointlocation
         {
             get
@@ -457,7 +427,7 @@ namespace Microsoft.Azure.Commands.Sql.Database.Cmdlet
         }
 
 
-        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "")]
+        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "Empty help message.")]
         public string Privateendpointsubnetid
         {
             get
@@ -471,7 +441,7 @@ namespace Microsoft.Azure.Commands.Sql.Database.Cmdlet
         }
 
 
-        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "")]
+        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "Empty help message.")]
         public string Privatelinkservicename
         {
             get
@@ -485,7 +455,7 @@ namespace Microsoft.Azure.Commands.Sql.Database.Cmdlet
         }
 
 
-        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "")]
+        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "Empty help message.")]
         public string Privatelinkserviceserviceid
         {
             get
@@ -499,7 +469,7 @@ namespace Microsoft.Azure.Commands.Sql.Database.Cmdlet
         }
 
 
-        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "")]
+        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "Empty help message.")]
         public string Privateendpointvnetsubscriptionid
         {
             get
@@ -513,7 +483,7 @@ namespace Microsoft.Azure.Commands.Sql.Database.Cmdlet
         }
 
 
-        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "")]
+        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "Empty help message.")]
         public string Privateendpointvnetresourcegroup
         {
             get
@@ -527,7 +497,7 @@ namespace Microsoft.Azure.Commands.Sql.Database.Cmdlet
         }
 
 
-        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "")]
+        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "Empty help message.")]
         public string Privateendpointvnetname
         {
             get
@@ -541,7 +511,7 @@ namespace Microsoft.Azure.Commands.Sql.Database.Cmdlet
         }
 
 
-        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "")]
+        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "Empty help message.")]
         public string Privateendpointsubnetname
         {
             get
@@ -555,7 +525,7 @@ namespace Microsoft.Azure.Commands.Sql.Database.Cmdlet
         }
 
 
-        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "")]
+        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "Empty help message.")]
         public bool Enableprivatednszone
         {
             get
@@ -569,7 +539,7 @@ namespace Microsoft.Azure.Commands.Sql.Database.Cmdlet
         }
 
 
-        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "")]
+        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "Empty help message.")]
         public string Privatelinkprivatednszonefqdn
         {
             get
@@ -583,7 +553,7 @@ namespace Microsoft.Azure.Commands.Sql.Database.Cmdlet
         }
 
 
-        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "")]
+        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "Empty help message.")]
         public string Privateendpointdnsrecorduniqueid
         {
             get
@@ -597,7 +567,7 @@ namespace Microsoft.Azure.Commands.Sql.Database.Cmdlet
         }
 
 
-        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "")]
+        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "Empty help message.")]
         public string Privateendpointtemplatelink
         {
             get
@@ -611,7 +581,7 @@ namespace Microsoft.Azure.Commands.Sql.Database.Cmdlet
         }
 
 
-        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "")]
+        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "Empty help message.")]
         public string Privatednsforprivateendpointtemplatelink
         {
             get
@@ -625,7 +595,7 @@ namespace Microsoft.Azure.Commands.Sql.Database.Cmdlet
         }
 
 
-        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "")]
+        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "Empty help message.")]
         public string Privatednsforprivateendpointnictemplatelink
         {
             get
@@ -639,7 +609,7 @@ namespace Microsoft.Azure.Commands.Sql.Database.Cmdlet
         }
 
 
-        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "")]
+        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "Empty help message.")]
         public string Privatednsforprivateendpointipconfigtemplatelink
         {
             get
@@ -653,7 +623,7 @@ namespace Microsoft.Azure.Commands.Sql.Database.Cmdlet
         }
 
 
-        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "")]
+        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "Empty help message.")]
         public bool Allowclientip
         {
             get
@@ -667,7 +637,7 @@ namespace Microsoft.Azure.Commands.Sql.Database.Cmdlet
         }
 
 
-        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "")]
+        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "Empty help message.")]
         public string Clientiprulename
         {
             get
@@ -681,7 +651,7 @@ namespace Microsoft.Azure.Commands.Sql.Database.Cmdlet
         }
 
 
-        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "")]
+        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "Empty help message.")]
         public string Clientipvalue
         {
             get
@@ -695,7 +665,7 @@ namespace Microsoft.Azure.Commands.Sql.Database.Cmdlet
         }
 
 
-        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "")]
+        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "Empty help message.")]
         public string Requestedbackupstorageredundancy
         {
             get
@@ -709,7 +679,7 @@ namespace Microsoft.Azure.Commands.Sql.Database.Cmdlet
         }
 
 
-        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "")]
+        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "Empty help message.")]
         public string Maintenanceconfigurationid
         {
             get
@@ -765,7 +735,7 @@ namespace Microsoft.Azure.Commands.Sql.Database.Cmdlet
         }
 
 
-        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "")]
+        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "Empty help message.")]
         public string Minimaltlsversion
         {
             get
@@ -779,7 +749,7 @@ namespace Microsoft.Azure.Commands.Sql.Database.Cmdlet
         }
 
 
-        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "")]
+        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "Empty help message.")]
         public string Connectiontype
         {
             get
@@ -793,7 +763,7 @@ namespace Microsoft.Azure.Commands.Sql.Database.Cmdlet
         }
 
 
-        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "")]
+        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "Empty help message.")]
         public string Publicnetworkaccess
         {
             get
@@ -807,7 +777,7 @@ namespace Microsoft.Azure.Commands.Sql.Database.Cmdlet
         }
 
 
-        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "")]
+        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "Empty help message.")]
         public bool Enablesqlledger
         {
             get
@@ -821,7 +791,7 @@ namespace Microsoft.Azure.Commands.Sql.Database.Cmdlet
         }
 
 
-        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "")]
+        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "Empty help message.")]
         public string Enabledigeststorage
         {
             get
@@ -835,7 +805,7 @@ namespace Microsoft.Azure.Commands.Sql.Database.Cmdlet
         }
 
 
-        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "")]
+        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "Empty help message.")]
         public string Digeststorageoption
         {
             get
@@ -849,7 +819,7 @@ namespace Microsoft.Azure.Commands.Sql.Database.Cmdlet
         }
 
 
-        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "")]
+        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "Empty help message.")]
         public string Digeststoragename
         {
             get
@@ -863,7 +833,7 @@ namespace Microsoft.Azure.Commands.Sql.Database.Cmdlet
         }
 
 
-        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "")]
+        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "Empty help message.")]
         public string Blobstoragecontainername
         {
             get
@@ -877,7 +847,7 @@ namespace Microsoft.Azure.Commands.Sql.Database.Cmdlet
         }
 
 
-        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "")]
+        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "Empty help message.")]
         public string Retentiondays
         {
             get
@@ -891,7 +861,7 @@ namespace Microsoft.Azure.Commands.Sql.Database.Cmdlet
         }
 
 
-        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "")]
+        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "Empty help message.")]
         public bool Retentionpolicy
         {
             get
@@ -905,7 +875,7 @@ namespace Microsoft.Azure.Commands.Sql.Database.Cmdlet
         }
 
 
-        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "")]
+        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "Empty help message.")]
         public string Digestaccountresourcegroup
         {
             get
@@ -919,7 +889,7 @@ namespace Microsoft.Azure.Commands.Sql.Database.Cmdlet
         }
 
 
-        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "")]
+        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "Empty help message.")]
         public string Digestregion
         {
             get
@@ -933,7 +903,7 @@ namespace Microsoft.Azure.Commands.Sql.Database.Cmdlet
         }
 
 
-        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "")]
+        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "Empty help message.")]
         public string Storageaccountdigestregion
         {
             get
@@ -947,7 +917,7 @@ namespace Microsoft.Azure.Commands.Sql.Database.Cmdlet
         }
 
 
-        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "")]
+        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "Empty help message.")]
         public bool Isnewdigestlocation
         {
             get
@@ -961,7 +931,7 @@ namespace Microsoft.Azure.Commands.Sql.Database.Cmdlet
         }
 
 
-        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "")]
+        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "Empty help message.")]
         public bool Ispermissionassigned
         {
             get
@@ -975,7 +945,7 @@ namespace Microsoft.Azure.Commands.Sql.Database.Cmdlet
         }
 
 
-        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "")]
+        [Parameter(ParameterSetName = "NewDatabaseNewServerNewElasticPool", Mandatory = false, HelpMessage = "Empty help message.")]
         public string Sqlledgertemplatelink
         {
             get

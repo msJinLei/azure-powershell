@@ -247,7 +247,7 @@ namespace Microsoft.Azure.Commands.Sql.Replication.Cmdlet
 
             // The database already exists
             throw new PSArgumentException(
-                string.Format(Resources.DatabaseNameExists, GetEffectivePartnerDatabaseName(this.DatabaseName, this.PartnerDatabaseName), this.PartnerServerName),
+                string.Format(Properties.Resources.DatabaseNameExists, GetEffectivePartnerDatabaseName(this.DatabaseName, this.PartnerDatabaseName), this.PartnerServerName),
                 "DatabaseName");
         }
 

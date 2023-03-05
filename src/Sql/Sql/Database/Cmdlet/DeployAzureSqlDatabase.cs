@@ -11,33 +11,32 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 // ----------------------------------------------------------------------------------
-
+using Microsoft.Azure.Commands.ResourceManager.Cmdlets.Implementation.CmdletBase;
+using Microsoft.Azure.Commands.ResourceManager.Cmdlets.SdkModels;
+using Microsoft.Azure.Commands.ResourceManager.Cmdlets.SdkModels.Deployments;
 using Microsoft.Azure.Commands.ResourceManager.Common.ArgumentCompleters;
-using Microsoft.Azure.Commands.ResourceManager.Common.Tags;
 using Microsoft.Azure.Commands.Sql.Database.Model;
-using Microsoft.Azure.Commands.Sql.Database.Sandbox;
 using Microsoft.Azure.Commands.Sql.Database.Services;
-using Microsoft.Azure.PowerShell.Cmdlets.Sql.Helpers.Resources.Models;
+using Microsoft.Azure.Management.ResourceManager.Models;
 using Microsoft.Rest.Azure;
-using Microsoft.WindowsAzure.Commands.Utilities.Common;
+
+using Newtonsoft.Json;
 
 using System;
 using System.Collections;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Management.Automation;
 using System.Reflection;
-
-using DatabaseReadScale = Microsoft.Azure.Commands.Sql.Database.Model.DatabaseReadScale;
 
 namespace Microsoft.Azure.Commands.Sql.Database.Cmdlet
 {
     /// <summary>
     /// Cmdlet to create a new Azure Sql Database
     /// </summary>
-    [Cmdlet("Deploy", ResourceManager.Common.AzureRMConstants.AzureRMPrefix + "SqlDatabase", SupportsShouldProcess = true,ConfirmImpact = ConfirmImpact.Low, DefaultParameterSetName = DtuDatabaseParameterSet), OutputType(typeof(AzureSqlDatabaseModel))]
-    public partial class DeployAzureSqlDatabase : AzureSqlDatabaseCmdletBase<AzureSqlDatabaseCreateOrUpdateModel>
+    [Cmdlet("Deploy", ResourceManager.Common.AzureRMConstants.AzureRMPrefix + "SqlDatabase", SupportsShouldProcess = true, ConfirmImpact = ConfirmImpact.Low, DefaultParameterSetName = "NewDatabaseNewServerNewElasticPool"), OutputType(typeof(AzureSqlDatabaseModel))]
+    //[global::Microsoft.Azure.PowerShell.Cmdlets.Sql.Description(@"Removes a content from CDN.")]
+    public partial class DeployAzureSqlDatabase : DeploymentCreateCmdlet
     {
         /// <summary>
         /// Gets or sets the name of the database to create.
@@ -46,95 +45,64 @@ namespace Microsoft.Azure.Commands.Sql.Database.Cmdlet
             HelpMessage = "The name of the Azure SQL Database to create.")]
         [Alias("Name")]
         [ValidateNotNullOrEmpty]
-        public string DatabaseName { get; set; }
+        public string DatabaseName
+        {
+            get
+            {
+                return (string)GetTemplateParameterValue("databaseName");
+            }
+            set
+            {
+                CreateTemplateParameterValue("databaseName", value);
+            }
+        }
 
         /// <summary>
-        /// Gets or sets the name of the Azure SQL Database collation to use
+        /// Gets or sets the name of the resource group to use.
         /// </summary>
-        [Parameter(Mandatory = false,
-            HelpMessage = "The name of the Azure SQL Database collation to use.")]
+        [Parameter(Mandatory = true,
+            ValueFromPipelineByPropertyName = true,
+            Position = 0,
+            HelpMessage = "The name of the resource group.")]
+        [ResourceGroupCompleter]
         [ValidateNotNullOrEmpty]
-        public string CollationName { get; set; }
+        public virtual string ResourceGroupName
+        {
+            get
+            {
+                return (string)GetTemplateParameterValue("resourceGroupName");
+            }
+            set
+            {
+                CreateTemplateParameterValue("resourceGroupName", value);
+            }
+        }
 
         /// <summary>
-        /// Gets or sets the name of the Azure SQL Database catalog collation to use
+        /// Gets or sets the name of the database server to use.
         /// </summary>
-        [Parameter(Mandatory = false,
-            HelpMessage = "The name of the Azure SQL Database catalog collation to use.")]
+        [Parameter(Mandatory = true,
+            ValueFromPipelineByPropertyName = true,
+            Position = 1,
+            HelpMessage = "The name of the Azure SQL Database Server the database is in.")]
+        [ResourceNameCompleter("Microsoft.Sql/servers", "ResourceGroupName")]
         [ValidateNotNullOrEmpty]
-        public string CatalogCollation { get; set; }
+        public string ServerName
+        {
+            get
+            {
+                return (string)GetTemplateParameterValue("serverName");
+            }
+            set
+            {
+                CreateTemplateParameterValue("serverName", value);
+            }
+        }
 
-        /// <summary>
-        /// Gets or sets the maximum size of the Azure SQL Database in bytes
-        /// </summary>
-        [Parameter(Mandatory = false,
-            HelpMessage = "The maximum size of the Azure SQL Database in bytes.")]
+        [Parameter(Mandatory = true, HelpMessage = "The location to store deployment data.")]
+        [LocationCompleter("Microsoft.Resources/resourceGroups")]
         [ValidateNotNullOrEmpty]
-        public long MaxSizeBytes { get; set; }
-
-        /// <summary>
-        /// Gets or sets the edition to assign to the Azure SQL Database
-        /// </summary>
-        [Parameter(ParameterSetName = DtuDatabaseParameterSet, Mandatory = false,
-            HelpMessage = "The edition to assign to the Azure SQL Database.")]
-        [Parameter(ParameterSetName = VcoreDatabaseParameterSet, Mandatory = true,
-            HelpMessage = "The edition to assign to the Azure SQL Database.")]
-        [ValidateNotNullOrEmpty]
-        [PSArgumentCompleter("None",
-            "Basic",
-            "Standard",
-            "Premium",
-            "DataWarehouse",
-            "Free",
-            "Stretch",
-            "GeneralPurpose",
-            "BusinessCritical")]
-        public string Edition { get; set; }
-
-        /// <summary>
-        /// Gets or sets the name of the service objective to assign to the Azure SQL Database
-        /// </summary>
-        [Parameter(ParameterSetName = DtuDatabaseParameterSet, Mandatory = false,
-            HelpMessage = "The name of the service objective to assign to the Azure SQL Database.")]
-        [ValidateNotNullOrEmpty]
-        public string RequestedServiceObjectiveName { get; set; }
-
-        /// <summary>
-        /// Gets or sets the name of the Elastic Pool to put the database in
-        /// </summary>
-        [Parameter(ParameterSetName = DtuDatabaseParameterSet, Mandatory = false,
-            HelpMessage = "The name of the Elastic Pool to put the database in.")]
-        [ResourceNameCompleter("Microsoft.Sql/servers/elasticPools", "ResourceGroupName", "ServerName")]
-        [ValidateNotNullOrEmpty]
-        public string ElasticPoolName { get; set; }
-
-        /// <summary>
-        /// Gets or sets the read scale option to assign to the Azure SQL Database
-        /// </summary>
-        [Parameter(Mandatory = false,
-            HelpMessage = "If enabled, connections that have application intent set to readonly in their connection string may be routed to a readonly secondary replica. This property is only settable for Premium and Business Critical databases.")]
-        [ValidateNotNullOrEmpty]
-        public DatabaseReadScale ReadScale { get; set; }
-
-        /// <summary>
-        /// Gets or sets the tags associated with the Azure Sql Database
-        /// </summary>
-        [Parameter(Mandatory = false,
-            HelpMessage = "The tags to associate with the Azure Sql Database Server")]
-        [Alias("Tag")]
-        public Hashtable Tags { get; set; }
-
-        [Parameter(Mandatory = false,
-            HelpMessage = "The name of the sample schema to apply when creating this database.")]
-        [ValidateSet("AdventureWorksLT")]
-        public string SampleName { get; set; }
-
-        /// <summary>
-        /// Gets or sets the zone redundant option to assign to the Azure SQL Database
-        /// </summary>
-        [Parameter(Mandatory = false,
-            HelpMessage = "The zone redundancy to associate with the Azure Sql Database")]
-        public SwitchParameter ZoneRedundant { get; set; }
+        public string Location { get; set; }
 
         /// <summary>
         /// Gets or sets whether or not to run this cmdlet in the background as a job
@@ -148,341 +116,134 @@ namespace Microsoft.Azure.Commands.Sql.Database.Cmdlet
         [Parameter(HelpMessage = "Skip confirmation message for performing the action")]
         public SwitchParameter Force { get; set; }
 
-        /// <summary>
-        /// Gets or sets the Vcore number for the Azure Sql database
-        /// </summary>
-        [Parameter(ParameterSetName = VcoreDatabaseParameterSet, Mandatory = true,
-            HelpMessage = "The Vcore number for the Azure Sql database")]
-        [Alias("Capacity", "MaxVCore", "MaxCapacity")]
-        public int VCore { get; set; }
+        #region hideParameterFromBaseCmdlet
+        private new Hashtable TemplateParameterObject { get; set; }
+        private new string TemplateParameterFile { get; set; }
+        private new string TemplateParameterUri { get; set; }
+        private new Hashtable TemplateObject { get; set; }
+        private new string TemplateFile { get; set; }
+        private new string TemplateUri { get; set; }
+        private new string TemplateSpecId { get; set; }
+        private new SwitchParameter SkipTemplateParameterPrompt { get; set; }
+        private new string QueryString { get; set; }
+        private new SwitchParameter Pre { get; set; }
+        #endregion
 
-        /// <summary>
-        /// Gets or sets the compute generation for the Azure Sql database
-        /// </summary>
-        [Parameter(ParameterSetName = VcoreDatabaseParameterSet, Mandatory = true,
-            HelpMessage = "The compute generation to assign.")]
-        [Alias("Family")]
-        [PSArgumentCompleter("Gen4", "Gen5")]
-        public string ComputeGeneration { get; set; }
+        private const string templateFile = "PortalTemplate.json";
 
-        /// <summary>
-        /// Gets or sets the license type for the Azure Sql database
-        /// </summary>
-        [Parameter(Mandatory = false,
-            HelpMessage = "The license type for the Azure Sql database. Possible values are BasePrice (with AHB discount) and LicenseIncluded (without AHB discount).")]
-        [PSArgumentCompleter(
-            "LicenseIncluded",
-            "BasePrice")]
-        public string LicenseType { get; set; }
+        private const string templateParameterFile = "Portal.Parameter.json";
 
-        /// <summary>
-        /// Gets or sets the compute model for Azure Sql database
-        /// </summary>
-        [Parameter(ParameterSetName = VcoreDatabaseParameterSet, Mandatory = false,
-            HelpMessage="The compute model for database. Serverless or Provisioned")]
-        [PSArgumentCompleter(
-            DatabaseComputeModel.Provisioned,
-            DatabaseComputeModel.Serverless)]
-        public string ComputeModel { get; set; }
+        protected override PSDeploymentCmdletParameters DeploymentParameters => new PSDeploymentCmdletParameters()
+        {
+            ScopeType = DeploymentScopeType.ResourceGroup,
+            //Location = this.Location,
+            ResourceGroupName = this.ResourceGroupName,
+            DeploymentName = GenerateDeploymentName(this.ParameterSetName),
+            DeploymentMode = DeploymentMode.Incremental,
+            //QueryString = this.QueryString,
+            //TemplateFile = this.TemplateUri ?? this.TryResolvePath(this.TemplateFile),
+            TemplateObject = JsonConvert.DeserializeObject<Hashtable>(GetArmTemplateContent(templateFile)),
+            //TemplateSpecId = TemplateSpecId,
+            TemplateParameterObject = GetTemplateParameterObject(),
+            //ParameterUri = this.TemplateParameterUri,
+            DeploymentDebugLogLevel = GetDeploymentDebugLogLevel("responsecontent"),
+            //Tags = TagsHelper.ConvertToTagsDictionary(this.Tag)
+        };
 
-        /// <summary>
-        /// Gets or sets the Auto Pause delay for Azure Sql Database
-        /// </summary>
-        [Parameter(Mandatory = false,
-            HelpMessage = "The auto pause delay in minutes for database(serverless only), -1 to opt out from pausing")]
-        public int AutoPauseDelayInMinutes { get; set; }
-
-        /// <summary>
-        /// Gets or sets the Minimal capacity that database will always have allocated, if not paused
-        /// </summary>
-        [Parameter(Mandatory = false,
-            HelpMessage = "The Minimal capacity that database will always have allocated, if not paused. For serverless database only.")]
-        [Alias("MinVCore", "MinCapacity")]
-        public double MinimumCapacity { get; set; }
-
-        /// <summary>
-        /// Gets or sets the number of readonly replicas for the Azure Sql database
-        /// </summary>
-        [Parameter(Mandatory = false,
-            HelpMessage = "The number of readonly secondary replicas associated with the database to which readonly application intent connections may be routed. This property is only settable for Hyperscale edition databases.")]
-        [Alias("ReadReplicaCount")]
-        public int HighAvailabilityReplicaCount { get; set; }
-
-        /// <summary>
-        /// Gets or sets the database backup storage redundancy.
-        /// </summary>
-        [Parameter(Mandatory = false,
-            HelpMessage = "The Backup storage redundancy used to store backups for the SQL Database. Options are: Local, Zone, Geo, and GeoZone.")]
-        [ValidateSet("Local", "Zone", "Geo", "GeoZone", IgnoreCase = false)]
-        public string BackupStorageRedundancy { get; set; }
-
-        /// <summary>
-        /// Gets or sets the secondary type for the database if it is a secondary.
-        /// </summary>
-        [Parameter(Mandatory = false,
-            HelpMessage = "The secondary type of the database if it is a secondary.  Valid values are Geo and Named.")]
-        [ValidateSet("Named", "Geo")]
-        public string SecondaryType { get; set; }
-
-        /// <summary>
-        /// Gets or sets the maintenance configuration id for the database
-        /// </summary>
-        [Parameter(Mandatory = false,
-            HelpMessage = "The Maintenance configuration id for the SQL Database.")]
-        public string MaintenanceConfigurationId { get; set; }
-
-        /// <summary>
-        /// Gets or sets the ledger option to assign to the Azure SQL Database
-        /// </summary>
-        [Parameter(Mandatory = false,
-            HelpMessage = "Creates a ledger database, in which the integrity of all data is protected by the ledger feature. All tables in the ledger database must be ledger tables. Note: the value of this property cannot be changed after the database has been created.")]
-        public SwitchParameter EnableLedger { get; set; }
-
-        /// <summary>
-        /// Gets or sets the preferred enclave type requested on the database.
-        /// </summary>
-        [Parameter(Mandatory = false,
-            HelpMessage = "The preferred enclave type for the Azure Sql database. Possible values are Default and VBS.")]
-        [PSArgumentCompleter(
-            "Default",
-            "VBS")]
-        public string PreferredEnclaveType { get; set; }
-
+        protected override PSDeploymentWhatIfCmdletParameters WhatIfParameters => new PSDeploymentWhatIfCmdletParameters(
+            DeploymentScopeType.ResourceGroup,
+            resourceGroupName: this.ResourceGroupName,
+            //location: this.Location,
+            deploymentName: GenerateDeploymentName(this.ParameterSetName),
+            mode: DeploymentMode.Incremental,
+            //queryString: this.QueryString,
+            //resourceGroupName: this.ResourceGroupName,
+            //templateUri: this.TemplateUri ?? this.TryResolvePath(this.TemplateFile),
+            templateObject: JsonConvert.DeserializeObject<Hashtable>(GetArmTemplateContent(templateFile)),
+            //templateSpecId: TemplateSpecId,
+            //templateParametersUri: this.TemplateParameterUri,
+            templateParametersObject: GetTemplateParameterObject(),
+            resultFormat: WhatIfResultFormat.FullResourcePayloads);
 
         /// <summary>
         /// Overriding to add warning message
         /// </summary>
-        public override void ExecuteCmdlet()
+        protected override void OnProcessRecord()
         {
+            //base.OnProcessRecord();
             ModelAdapter = InitModelAdapter();
-            string location = ModelAdapter.GetServerLocation(ResourceGroupName, ServerName);
-            if (ListOfRegionsToShowWarningMessageForGeoBackupStorage.Contains(location.ToLower()))
-            {
-                if (this.BackupStorageRedundancy == null)
-                {
-                    if (!Force.IsPresent && !ShouldContinue(
-                        string.Format(CultureInfo.InvariantCulture, Properties.Resources.DoYouWantToProceed, this.DatabaseName),
-                        string.Format(CultureInfo.InvariantCulture, Properties.Resources.BackupRedundancyNotChosenTakeGeoWarning)))
-                    {
-                        return;
-                    }
-                }
-                else if (string.Equals(this.BackupStorageRedundancy, "Geo", System.StringComparison.OrdinalIgnoreCase))
-                {
-                    WriteWarning(string.Format(CultureInfo.InvariantCulture, Properties.Resources.BackupRedundancyChosenIsGeoWarning));
-                }
-            }
-
-
-
-            if (ShouldProcess("", ""))
-            {
-                var deployment = GetDeployment();
-                TemplateDeploymentClient.CreateSqlDatabase(deployment, this);
-                //fixme: reply DatabaseName, ServerName, ResourceGroupName
-                WriteObject(TransformModelToOutputObject(GetEntity()));
-            }
-            else
-            {
-                string whatIfMessage = null;
-                string warningMessage = null;
-                string captionMessage = null;
-                var deploymentWhatif = GetDeploymentWhatIf();
-                PSWhatIfOperationResult whatIfResult = TemplateDeploymentClient.ExecuteDeploymentWhatIf(deploymentWhatif);
-                string whatIfFormattedOutput = WhatIfOperationResultFormatter.Format(whatIfResult);
-                string cursorUp = $"{(char)27}[1A";
-
-                // Use \r to override the built-in "What if:" in output.
-                whatIfMessage = $"\r        \r{Environment.NewLine}{whatIfFormattedOutput}{Environment.NewLine}";
-                warningMessage = $"{Environment.NewLine}{"ConfirmDeploymentMessage"}";
-                captionMessage = $"{cursorUp}{Color.Reset}{whatIfMessage}";
-                // this.WriteObject(whatIfResult);
-                this.ShouldProcess(whatIfMessage, warningMessage, captionMessage);
-            }
+            WriteObject(TransformModelToOutputObject(GetEntity()));
         }
 
-        /// <summary>
-        /// Get the entities from the service
-        /// </summary>
-        /// <returns>The list of entities</returns>
-        protected override AzureSqlDatabaseCreateOrUpdateModel GetEntity()
+        protected override ConfirmImpact ConfirmImpact => ((CmdletAttribute)Attribute.GetCustomAttribute(
+            typeof(DeployAzureSqlDatabase),
+            typeof(CmdletAttribute))).ConfirmImpact;
+
+        protected override bool ShouldSkipConfirmationIfNoChange()
         {
-            // We try to get the database.  Since this is a create, we don't want the database to exist
-            try
-            {
-                ModelAdapter.GetDatabase(this.ResourceGroupName, this.ServerName, this.DatabaseName);
-            }
-            catch (CloudException ex)
-            {
-                if (ex.Response.StatusCode == System.Net.HttpStatusCode.NotFound)
-                {
-                    // This is what we want.  We looked and there is no database with this name.
-                    return null;
-                }
-
-                // Unexpected exception encountered
-                throw;
-            }
-
-            // The database already exists
-            throw new PSArgumentException(
-                string.Format(Microsoft.Azure.Commands.Sql.Properties.Resources.DatabaseNameExists, this.DatabaseName, this.ServerName),
-                "DatabaseName");
+            throw new NotImplementedException();
         }
 
-        /// <summary>
-        /// Create the model from user input
-        /// </summary>
-        /// <param name="model">Model retrieved from service</param>
-        /// <returns>The model that was passed in</returns>
-        protected override AzureSqlDatabaseCreateOrUpdateModel ApplyUserInputToModel(AzureSqlDatabaseCreateOrUpdateModel model)
-        {
-            string location = ModelAdapter.GetServerLocation(ResourceGroupName, ServerName);
-            AzureSqlDatabaseCreateOrUpdateModel dbCreateUpdateModel = new AzureSqlDatabaseCreateOrUpdateModel();
-            AzureSqlDatabaseModel newDbModel = new AzureSqlDatabaseModel()
-            {
-                Location = location,
-                ResourceGroupName = ResourceGroupName,
-                ServerName = ServerName,
-                CatalogCollation = CatalogCollation,
-                CollationName = CollationName,
-                DatabaseName = DatabaseName,
-                MaxSizeBytes = MaxSizeBytes,
-                Tags = TagsConversionHelper.CreateTagDictionary(Tags, validate: true),
-                ElasticPoolName = ElasticPoolName,
-                ReadScale = this.IsParameterBound(p => p.ReadScale) ? ReadScale : (DatabaseReadScale?)null,
-                ZoneRedundant = this.IsParameterBound(p => p.ZoneRedundant) ? ZoneRedundant.ToBool() : (bool?)null,
-                LicenseType = LicenseType, // note: default license type will be LicenseIncluded in SQL RP if not specified
-                AutoPauseDelayInMinutes = this.IsParameterBound(p => p.AutoPauseDelayInMinutes) ? AutoPauseDelayInMinutes : (int?)null,
-                MinimumCapacity = this.IsParameterBound(p => p.MinimumCapacity) ? MinimumCapacity : (double?)null,
-                HighAvailabilityReplicaCount = this.IsParameterBound(p => p.HighAvailabilityReplicaCount) ? HighAvailabilityReplicaCount : (int?)null,
-                RequestedBackupStorageRedundancy = BackupStorageRedundancy,
-                SecondaryType = SecondaryType,
-                MaintenanceConfigurationId = MaintenanceConfigurationId,
-                EnableLedger = this.IsParameterBound(p => p.EnableLedger) ? EnableLedger.ToBool() : (bool?)null,
-                PreferredEnclaveType = this.PreferredEnclaveType,
-            };
+        //private DeploymentClient _client = null;
 
-            if (ParameterSetName == DtuDatabaseParameterSet)
-            {
-                newDbModel.SkuName = string.IsNullOrWhiteSpace(RequestedServiceObjectiveName) ? AzureSqlDatabaseAdapter.GetDatabaseSkuName(Edition) : RequestedServiceObjectiveName;
-                newDbModel.Edition = Edition;
-            }
-            else
-            {
-                newDbModel.SkuName = AzureSqlDatabaseAdapter.GetDatabaseSkuName(Edition, ComputeModel == DatabaseComputeModel.Serverless);
-                newDbModel.Edition = Edition;
-                newDbModel.Capacity = VCore;
-                newDbModel.Family = ComputeGeneration;
-            }
+        //internal DeploymentClient TemplateDeploymentClient
+        //{
+        //    get
+        //    {
+        //        if (_client == null)
+        //        {
+        //            _client = new DeploymentClient(DefaultContext, ResourceGroupName, ParameterSetName);
+        //        }
+        //        return _client;
+        //    }
+        //}
 
-            dbCreateUpdateModel.Database = newDbModel;
-            dbCreateUpdateModel.SampleName = SampleName;
+        //Deployment GetDeployment()
+        //{
+        //    const string DefaultTemplatePath = "Microsoft.Azure.Commands.Sql.Resources.NewDatabaseNewServerNewElasticPool.json";
+        //    string templateContent = null;
 
-            return dbCreateUpdateModel;
-        }
+        //    using (var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(DefaultTemplatePath))
+        //    using (var reader = new StreamReader(stream))
+        //    {
+        //        templateContent = reader.ReadToEnd();
+        //    }
 
-        /// <summary>
-        /// Create the new database
-        /// </summary>
-        /// <param name="entity">The output of apply user input to model</param>
-        /// <returns>The input entity</returns>
-        protected override AzureSqlDatabaseCreateOrUpdateModel PersistChanges(AzureSqlDatabaseCreateOrUpdateModel entity)
-        {
-            // Use AutoRest Sdk
-            AzureSqlDatabaseModel upsertedDatabase = ModelAdapter.UpsertDatabaseWithNewSdk(this.ResourceGroupName, this.ServerName, entity);
-            
-            return new AzureSqlDatabaseCreateOrUpdateModel
-            {
-                Database = upsertedDatabase
-            };
-        }
+        //    var deployment = new Deployment()
+        //    {
+        //        Location = Serverlocation,
+        //        Properties = new DeploymentProperties
+        //        {
+        //            Mode = DeploymentMode.Incremental,
+        //            Template = templateContent,
+        //            Parameters = TemplateParameterObject
+        //        }
+        //    };
+        //    return deployment;
+        //}
 
-        /// <summary>
-        /// Strips away the create or update properties from the model so that just the regular properties
-        /// are written to cmdlet output.
-        /// </summary>
-        protected override object TransformModelToOutputObject(AzureSqlDatabaseCreateOrUpdateModel model)
-        {
-            return model.Database;
-        }
+        //DeploymentWhatIf GetDeploymentWhatIf()
+        //{
+        //    const string DefaultTemplatePath = "Microsoft.Azure.Commands.Sql.Resources.NewDatabaseNewServerNewElasticPool.json";
+        //    string templateContent = null;
 
-        private DeploymentClient _client = null;
+        //    using (var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(DefaultTemplatePath))
+        //    using (var reader = new StreamReader(stream))
+        //    {
+        //        templateContent = reader.ReadToEnd();
+        //    }
 
-        internal DeploymentClient TemplateDeploymentClient
-        {
-            get
-            {
-                if (_client == null)
-                {
-                    _client = new DeploymentClient(DefaultContext, ResourceGroupName, ParameterSetName);
-                }
-                return _client;
-            }
-        }
+        //    var deploymentWhatIf = new DeploymentWhatIf()
+        //    {
+        //        Location = Serverlocation,
 
-
-        private Hashtable parametersFromTemplate = new Hashtable();
-
-        private void CreateTemplateParameterValue(string name, object value)
-        {
-            parametersFromTemplate[name] = new Hashtable { { "value", value } };
-        }
-
-        private object GetTemplateParameterValue(string name)
-        {
-            return parametersFromTemplate.Contains(name) ? parametersFromTemplate[name] : null;
-        }
-
-        //[Parameter(Mandatory = true, HelpMessage = "")]
-        //public string ResourceGroupName { get; set; }
-
-        Deployment GetDeployment()
-        {
-            const string DefaultTemplatePath = "Microsoft.Azure.Commands.Sql.Resources.NewDatabaseNewServerNewElasticPool.json";
-            string templateContent = null;
-
-            using (var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(DefaultTemplatePath))
-            using (var reader = new StreamReader(stream))
-            {
-                templateContent = reader.ReadToEnd();
-            }
-
-            var deployment = new Deployment()
-            {
-                Location = Serverlocation,
-                Properties = new DeploymentProperties
-                {
-                    Mode = DeploymentMode.Incremental,
-                    Template = templateContent,
-                    Parameters = parametersFromTemplate
-                }
-            };
-            return deployment;
-        }
-
-        DeploymentWhatIf GetDeploymentWhatIf()
-        {
-            const string DefaultTemplatePath = "Microsoft.Azure.Commands.Sql.Resources.NewDatabaseNewServerNewElasticPool.json";
-            string templateContent = null;
-
-            using (var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(DefaultTemplatePath))
-            using (var reader = new StreamReader(stream))
-            {
-                templateContent = reader.ReadToEnd();
-            }
-
-            var deploymentWhatIf = new DeploymentWhatIf()
-            {
-                Location = Serverlocation,
-               
-                Properties = new DeploymentWhatIfProperties()
-                {
-                    Mode = DeploymentMode.Incremental,
-                    WhatIfSettings = new DeploymentWhatIfSettings(WhatIfResultFormat.FullResourcePayloads)
-                }
-            };
-            return deploymentWhatIf;
-        }
+        //        Properties = new DeploymentWhatIfProperties()
+        //        {
+        //            Mode = DeploymentMode.Incremental,
+        //            WhatIfSettings = new DeploymentWhatIfSettings(WhatIfResultFormat.FullResourcePayloads)
+        //        }
+        //    };
+        //    return deploymentWhatIf;
+        //}
     }
 }

@@ -134,7 +134,7 @@ namespace Microsoft.Azure.Commands.Sql.ManagedDatabase.Cmdlet
 
             if (AutoCompleteRestore.IsPresent && string.IsNullOrEmpty(LastBackupName))
             {
-                throw new ArgumentNullException(nameof(LastBackupName), Resources.StartManagedDatabaseLogReplay_LastBackupName_Warning);
+                throw new ArgumentNullException(nameof(LastBackupName), Properties.Resources.StartManagedDatabaseLogReplay_LastBackupName_Warning);
             }
 
             model.AutoCompleteRestore = AutoCompleteRestore;

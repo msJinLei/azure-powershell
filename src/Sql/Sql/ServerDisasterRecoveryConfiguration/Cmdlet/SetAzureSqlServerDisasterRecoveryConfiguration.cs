@@ -121,7 +121,7 @@ namespace Microsoft.Azure.Commands.Sql.ServerDisasterRecoveryConfiguration.Cmdle
                     break;
                 default:
                     // Warning user that no options were provided so no action can be taken.
-                    WriteWarning(Resources.SetDisasterRecoveryConfigurationNoOptionProvided);
+                    WriteWarning(Properties.Resources.SetDisasterRecoveryConfigurationNoOptionProvided);
                     break;
             }
 

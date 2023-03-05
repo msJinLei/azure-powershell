@@ -128,7 +128,7 @@ namespace Microsoft.Azure.Commands.Sql.Replication.Cmdlet
                     };
                 default:
                     // Warning user that no options were provided so no action can be taken.
-                    WriteWarning(Resources.SetSecondaryNoOptionProvided);
+                    WriteWarning(Properties.Resources.SetSecondaryNoOptionProvided);
                     break;
             }
 
