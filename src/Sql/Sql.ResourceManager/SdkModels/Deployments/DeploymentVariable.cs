@@ -38,7 +38,7 @@ namespace Microsoft.Azure.Commands.ResourceManager.Cmdlets.SdkModels
             result.AppendLine();
             result.AppendFormat(rowFormat, "Type", "Value");
             result.AppendFormat(rowFormat, GeneralUtilities.GenerateSeparator(maxTypeLength, "-"), GeneralUtilities.GenerateSeparator(10, "-"));
-            result.AppendFormat(rowFormat, Type, Value.ToString().Indent(maxTypeLength + 2).Trim());
+            result.AppendFormat(rowFormat, Type, (Value ?? "null").ToString().Indent(maxTypeLength + 2).Trim());
             return result.ToString();
         }
     }
