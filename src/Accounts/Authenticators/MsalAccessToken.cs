@@ -15,6 +15,8 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -80,6 +82,7 @@ namespace Microsoft.Azure.PowerShell.Authenticators
         {
             TracingAdapter.Information($"{DateTime.Now:T} - [{callerClassName}] Calling {tokenCredential.GetType().Name}.GetTokenAsync {parametersLog}");
             var token = await tokenCredential.GetTokenAsync(requestContext, cancellationToken).ConfigureAwait(false);
+            tenantId = GetTenantIdFromToken(token.Token, tenantId);
             return new MsalAccessToken(tokenCredential, requestContext, token.Token, token.ExpiresOn, tenantId, userId, homeAccountId);
         }
 
@@ -94,8 +97,20 @@ namespace Microsoft.Azure.PowerShell.Authenticators
             cancellationToken.ThrowIfCancellationRequested();
             TracingAdapter.Information($"{DateTime.Now:T} - [MsalAccessToken] Calling {tokenCredential.GetType().Name}.GetTokenAsync - Scopes:'{string.Join(",", requestContext.Scopes)}'");
             var token = await tokenCredential.GetTokenAsync(requestContext, cancellationToken).ConfigureAwait(false);
+            var tenantId = GetTenantIdFromToken(token.Token, record.TenantId);
+            return new MsalAccessToken(tokenCredential, requestContext, token.Token, token.ExpiresOn, tenantId, record.Username, record.HomeAccountId);
+        }
 
-            return new MsalAccessToken(tokenCredential, requestContext, token.Token, token.ExpiresOn, record.TenantId, record.Username, record.HomeAccountId);
+        private static string GetTenantIdFromToken(string token, string tenantId)
+        {
+            var handler = new JwtSecurityTokenHandler();
+            var jwtToken = handler.ReadToken(token) as JwtSecurityToken;
+            var tid = jwtToken.Claims.First(claim => claim.Type == "tid").Value;
+            if (Guid.TryParse(tid, out Guid _))
+            {
+                return tid;
+            }
+            return tenantId;
         }
 
 
