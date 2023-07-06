@@ -12,22 +12,22 @@
 // limitations under the License.
 // ----------------------------------------------------------------------------------
 
-using System;
-using System.Diagnostics;
-using System.Net;
-using System.Net.Sockets;
-using System.Runtime.InteropServices;
-using System.Threading;
-using System.Threading.Tasks;
-
 using Azure.Core;
 using Azure.Identity;
-using Azure.Identity.BrokeredAuthentication;
 
 using Hyak.Common;
 
 using Microsoft.Azure.Commands.Common.Authentication;
 using Microsoft.Azure.Commands.Common.Authentication.Abstractions;
+
+using System;
+using System.IO;
+using System.Linq;
+using System.Net;
+using System.Net.Sockets;
+using System.Reflection;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Microsoft.Azure.PowerShell.Authenticators
 {
@@ -43,6 +43,21 @@ namespace Microsoft.Azure.PowerShell.Authenticators
         // possible ports for aad: [8400, 9000)
         protected const int AadPortStart = 8400;
         protected const int AadPortEnd = 9000;
+
+        private static string GetFileContent(string fileName)
+        {
+            var resourceNames = Assembly.GetExecutingAssembly().GetManifestResourceNames();
+            var resourceName = resourceNames.FirstOrDefault(str => str.EndsWith(fileName));
+            string conntent;
+            using (Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(resourceName))
+            {
+                using (StreamReader reader = new StreamReader(stream))
+                {
+                    conntent = reader.ReadToEnd();
+                }
+            }
+            return conntent;
+        }
 
         public override Task<IAccessToken> Authenticate(AuthenticationParameters parameters, CancellationToken cancellationToken)
         {
@@ -66,8 +81,11 @@ namespace Microsoft.Azure.PowerShell.Authenticators
                 TokenCachePersistenceOptions = tokenCacheProvider.GetTokenCachePersistenceOptions(),
                 AuthorityHost = new Uri(authority),
                 RedirectUri = GetReplyUrl(onPremise, interactiveParameters.PromptAction),
-                LoginHint = interactiveParameters.UserId,
+                LoginHint = interactiveParameters.UserId
             };
+            options.BrowserCustomizationOptions.UseEmbeddedWebView = false;
+            options.BrowserCustomizationOptions.HtmlMessageSuccess = GetFileContent("success.html") ?? null;
+            options.BrowserCustomizationOptions.HtmlMessageError = GetFileContent("error.html") ?? null;
             var browserCredential = new InteractiveBrowserCredential(options);
 
             TracingAdapter.Information($"{DateTime.Now:T} - [InteractiveUserAuthenticator] Calling InteractiveBrowserCredential.AuthenticateAsync with TenantId:'{options.TenantId}', Scopes:'{string.Join(",", scopes)}', AuthorityHost:'{options.AuthorityHost}', RedirectUri:'{options.RedirectUri}'");

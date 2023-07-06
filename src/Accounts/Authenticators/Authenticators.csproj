@@ -23,6 +23,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="LandingPages\error.html" />
+    <EmbeddedResource Include="LandingPages\success.html" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Authentication\Authentication.csproj" />
   </ItemGroup>
 
