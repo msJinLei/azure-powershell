@@ -23,6 +23,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\..\azure-sdk-for-net\sdk\identity\Azure.Identity\src\Azure.Identity.csproj" />
     <ProjectReference Include="..\Authentication\Authentication.csproj" />
   </ItemGroup>
 

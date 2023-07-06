@@ -15,10 +15,13 @@
     <PackageReference Include="Azure.Identity" Version="1.6.1" />
     <PackageReference Include="Azure.Identity.BrokeredAuthentication" Version="1.0.0-beta.3" />
     <PackageReference Include="Microsoft.Identity.Client" Version="4.49.1" />
-    <PackageReference Include="Microsoft.Identity.Client.Extensions.Msal" Version="2.23.0" />
+    <PackageReference Include="Microsoft.Identity.Client.Extensions.Msal" Version="2.25.3" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\..\azure-sdk-for-net\sdk\core\Azure.Core\src\Azure.Core.csproj" />
+    <ProjectReference Include="..\..\..\..\azure-sdk-for-net\sdk\identity\Azure.Identity.BrokeredAuthentication\src\Azure.Identity.BrokeredAuthentication.csproj" />
+    <ProjectReference Include="..\..\..\..\azure-sdk-for-net\sdk\identity\Azure.Identity\src\Azure.Identity.csproj" />
     <ProjectReference Include="..\AssemblyLoading\AssemblyLoading.csproj" />
   </ItemGroup>
 

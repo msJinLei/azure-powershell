@@ -21,6 +21,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Azure.PowerShell.Authenticators.Identity;
+using Azure.Identity;
 
 namespace Microsoft.Azure.PowerShell.Authenticators
 {
@@ -40,12 +41,13 @@ namespace Microsoft.Azure.PowerShell.Authenticators
             var requestContext = new TokenRequestContext(scopes);
             AzureSession.Instance.TryGetComponent(nameof(AzureCredentialFactory), out AzureCredentialFactory azureCredentialFactory);
 
-            var options = new ClientAssertionCredentialOptions()
+            var options = new Identity.ClientAssertionCredentialOptions()
             {
                 TokenCachePersistenceOptions = spParameters.TokenCacheProvider.GetTokenCachePersistenceOptions()
             };
+            options.TokenCachePersistenceOptions.Name = "";
             options.Diagnostics.IsTelemetryEnabled = false; // disable telemetry to avoid error thrown from Azure.Core that AssemblyInformationalVersion is null
-            TokenCredential tokenCredential = new ClientAssertionCredential(tenantId, spParameters.ClientId, () => GetClientAssertion(spParameters), options);
+            TokenCredential tokenCredential = new Identity.ClientAssertionCredential(tenantId, spParameters.ClientId, () => GetClientAssertion(spParameters), options);
             string parametersLog = $"- ClientId:'{spParameters.ClientId}', TenantId:'{tenantId}', ClientAssertion:'***' Scopes:'{string.Join(",", scopes)}'";
             return MsalAccessToken.GetAccessTokenAsync(
                 nameof(ClientAssertionAuthenticator),

@@ -49,6 +49,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\..\azure-sdk-for-net\sdk\core\Azure.Core\src\Azure.Core.csproj" />
+    <ProjectReference Include="..\..\..\..\azure-sdk-for-net\sdk\identity\Azure.Identity.BrokeredAuthentication\src\Azure.Identity.BrokeredAuthentication.csproj" />
+    <ProjectReference Include="..\..\..\..\azure-sdk-for-net\sdk\identity\Azure.Identity\src\Azure.Identity.csproj" />
     <ProjectReference Include="..\Authentication.ResourceManager\Authentication.ResourceManager.csproj" />
     <ProjectReference Include="..\Authentication\Authentication.csproj" />
     <ProjectReference Include="..\Authenticators\Authenticators.csproj" />
