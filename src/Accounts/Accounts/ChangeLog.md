@@ -21,6 +21,7 @@
 ## Upcoming Release
 * Upgraded Azure.Identity to 1.10.3 [#23018].
   - Renamed token cache from `msal.cache` to `msal.cache.cae` or `masl.cache.nocae`.
+* Enable Continue Access Evalution (CAE) for Service Principal and Federated Token login method.
 * Enabled in-tool notification for version upgrade by default.
 * Upgraded Azure.Core to 1.35.0.
 
