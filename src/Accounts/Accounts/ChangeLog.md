@@ -19,6 +19,8 @@
 -->
 
 ## Upcoming Release
+* Upgraded Azure.Identity to 1.10.3 [#23018].
+  - Renamed token cache from `msal.cache` to `msal.cache.cae` or `masl.cache.nocae`.
 * Enabled in-tool notification for version upgrade by default.
 * Upgraded Azure.Core to 1.35.0.
 
