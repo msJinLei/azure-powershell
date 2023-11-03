@@ -158,8 +158,8 @@ namespace Microsoft.Azure.Commands.Common.Authentication
             {
                 if (session.ARMContextSaveMode == ContextSaveMode.CurrentUser)
                 {
-                    var oldMsalCachePath = Path.Combine(session.TokenCacheDirectory, MsalCacheHelperProvider.LegacyTokenCacheName);
-                    var newMsalCachePath = Path.Combine(session.TokenCacheDirectory, session.TokenCacheFile);
+                    var oldMsalCachePath = Path.Combine(MsalCacheHelperProvider.MsalTokenCachePath, MsalCacheHelperProvider.LegacyTokenCacheName);
+                    var newMsalCachePath = Path.Combine(MsalCacheHelperProvider.MsalTokenCachePath, session.TokenCacheFile);
                     var store = session.DataStore;
                     if (store.FileExists(oldMsalCachePath) && !store.FileExists(newMsalCachePath))
                     {
@@ -282,7 +282,7 @@ namespace Microsoft.Azure.Commands.Common.Authentication
 
 
             string oldCachePath = Path.Combine(profilePath, "TokenCache.dat");
-            string cachePath = MsalCacheHelperProvider.MsalTokenCachePath;
+            string cachePath = Path.Combine(SharedUtilities.GetUserRootDirectory(), ".IdentityService");
             var session = new AdalSession
             {
                 ClientFactory = new ClientFactory(),
