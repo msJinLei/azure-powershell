@@ -163,14 +163,14 @@ namespace Microsoft.Azure.Commands.Common.Authentication
                     var store = session.DataStore;
                     if (store.FileExists(oldMsalCachePath) && !store.FileExists(newMsalCachePath))
                     {
-                        MsalCacheHelper oldCacheHelper = MsalCacheHelperProvider.GetCacheHelper(MsalCacheHelperProvider.LegacyTokenCacheName);
-                        var data = oldCacheHelper.LoadUnencryptedTokenCache();
-                        if (data != null && data.Length > 0)
-                        {
-                            MsalCacheHelperProvider.Reset();
-                            MsalCacheHelper newCacheHelper = MsalCacheHelperProvider.GetCacheHelper(session.TokenCacheFile);
-                            newCacheHelper.SaveUnencryptedTokenCache(data);
-                        }
+                    }
+                    MsalCacheHelper oldCacheHelper = MsalCacheHelperProvider.GetCacheHelper(MsalCacheHelperProvider.LegacyTokenCacheName);
+                    var data = oldCacheHelper.LoadUnencryptedTokenCache();
+                    if (data != null && data.Length > 0)
+                    {
+                        MsalCacheHelperProvider.Reset();
+                        MsalCacheHelper newCacheHelper = MsalCacheHelperProvider.GetCacheHelper(session.TokenCacheFile);
+                        newCacheHelper.SaveUnencryptedTokenCache(data);
                     }
                 }
             }
