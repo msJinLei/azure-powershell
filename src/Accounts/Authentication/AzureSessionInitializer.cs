@@ -158,20 +158,24 @@ namespace Microsoft.Azure.Commands.Common.Authentication
             {
                 if (session.ARMContextSaveMode == ContextSaveMode.CurrentUser)
                 {
+
                     var oldMsalCachePath = Path.Combine(MsalCacheHelperProvider.MsalTokenCachePath, MsalCacheHelperProvider.LegacyTokenCacheName);
                     var newMsalCachePath = Path.Combine(MsalCacheHelperProvider.MsalTokenCachePath, session.TokenCacheFile);
+                    var caeFileName = "msal.cache.cae";
                     var store = session.DataStore;
-                    if (store.FileExists(oldMsalCachePath) && !store.FileExists(newMsalCachePath))
+                    if (!store.FileExists(oldMsalCachePath) || store.FileExists(newMsalCachePath))
                     {
-                        MsalCacheHelper oldCacheHelper = MsalCacheHelperProvider.GetCacheHelper(MsalCacheHelperProvider.LegacyTokenCacheName);
-                        var data = oldCacheHelper.LoadUnencryptedTokenCache();
-                        if (data != null && data.Length > 0)
-                        {
-                            MsalCacheHelperProvider.Reset();
-                            MsalCacheHelper newCacheHelper = MsalCacheHelperProvider.GetCacheHelper(session.TokenCacheFile);
-                            newCacheHelper.SaveUnencryptedTokenCache(data);
-                        }
+                        throw new Exception("No migration needed!");
                     }
+                    MsalCacheHelper oldCacheHelper = MsalCacheHelperProvider.GetCacheHelper(MsalCacheHelperProvider.LegacyTokenCacheName);
+                    var data = oldCacheHelper.LoadUnencryptedTokenCache();
+                    if (data == null || data.Length == 0)
+                    {
+                        throw new Exception("Cannot read data from keychain!");
+                    }
+                    MsalCacheHelperProvider.Reset();
+                    MsalCacheHelper newCacheHelper = MsalCacheHelperProvider.GetCacheHelper(caeFileName);
+                    newCacheHelper.SaveUnencryptedTokenCache(data);
                 }
             }
             catch (Exception e)
