@@ -64,7 +64,7 @@ $password = 'pa88w0rd!'
 Set-AzContext -TenantId $tenantId
 Import-Module "$PSScriptRoot/CertificateUtility.psm1"
 
-if (($null -ne $Path) -and ($null -ne $PfxFileName)) {
+if ($Path -and $PfxFileName) {
     $paramsCertificate = @{
         KeyVaultName      = $keyVaultName;
         CertificateName   = $certificateName;

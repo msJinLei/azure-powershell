@@ -35,7 +35,6 @@ $certificateName = "${credentialPrefix}Certificate"
 $secretName = "${credentialPrefix}Secret"
 $federatedName = "${credentialPrefix}ADFS"
 
-$roleName = "Contributor"
 $password = 'pa88w0rd!'
 $subject = 'CN=AzAccountsTest'
 
@@ -55,6 +54,7 @@ $pfxFile = Get-CertificateFromKeyVault @params
 $sp = New-AzADServicePrincipal -DisplayName $servicePrincipalName
 $app = Get-AzADApplication -ApplicationId $sp.AppId
 
+$roleName = "Contributor"
 $scope = "/subscriptions/$subscriptionId"
 try {
     $spRoleAssg = Get-AzRoleAssignment -ObjectId $app.Id -Scope $scope -RoleDefinitionName $roleName -ErrorAction 'Stop'
@@ -65,6 +65,8 @@ try {
 catch {
     throw "Exception occurred when retrieving the role assignment for service principal with error message $($_.Exception.Message)."
 }
+
+Set-AzKeyVaultAccessPolicy -VaultName $keyVaultName -ServicePrincipalName $sp.AppId  -PermissionsToSecrets @('Get','List') -PermissionsToKeys @('Get','List') -PermissionsToCertificates @('Get', 'List')
 
 $pfxCert = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2($pfxFile, $password)
 $keyValue = [System.Convert]::ToBase64String($pfxCert.GetRawCertData())
