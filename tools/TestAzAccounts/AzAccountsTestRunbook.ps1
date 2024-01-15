@@ -25,7 +25,7 @@ Disable-AzContextAutosave -Scope Process | Out-Null
 # Connect using a Managed Service Identity
 try
 {
-    $AzureContext = (Connect-AzAccount -Identity).context
+    $AzureContext = (Connect-AzAccount -Identity).Context
 }
 catch
 {
@@ -35,6 +35,7 @@ catch
 
 # set and store context
 $AzureContext = Set-AzContext -SubscriptionName $AzureContext.Subscription -DefaultProfile $AzureContext
+Write-Output "Account ID of current context: $($AzureContext.Account.Id)"
 
 if ($Method -eq 'SA')
 {
@@ -49,7 +50,7 @@ elseif ($Method -eq 'UA')
 
     # validates assignment only, not perms
     $autoAccount = Get-AzAutomationAccount -ResourceGroupName $ResourceGroupName -Name $AutomationAccount -DefaultProfile $AzureContext
-    if ($autoAccount.Identity.UserAssignedIdentities.Values.PrincipalId.Contains($identity.PrincipalId))
+    if ($autoAccount.Identity.UserAssignedIdentities.Length -gt 0 -and $autoAccount.Identity.UserAssignedIdentities.Values.PrincipalId.Contains($identity.PrincipalId))
     {
         $AzureContext = (Connect-AzAccount -Identity -AccountId $identity.ClientId).context
 
