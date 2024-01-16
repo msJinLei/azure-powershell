@@ -28,19 +28,21 @@ $params = [ordered]@{
     "Method" = "UA"
 }
 Start-AzAutomationRunbook -AutomationAccountName $automationAccount -Name $runbookName -ResourceGroupName $resourceGroupName -Parameters $params
-exit
+
+$job = Get-AzAutomationJob -RunbookName $runbookName -AutomationAccountName $automationAccount -ResourceGroupName $resourceGroupName
 $output = $null
-while ($null-eq $output)
+while ($null -eq $output)
 {
-    $job = Get-AzAutomationJob -RunbookName $runbookName -AutomationAccountName $automationAccount -ResourceGroupName $resourceGroupName
     $output = Get-AzAutomationJobOutput -Id $job.JobId -AutomationAccountName $automationAccount -ResourceGroupName $resourceGroupName -Stream 'Any'
-    Start-Sleep -Seconds 5
+    Start-Sleep -Seconds 2
 }
 
 $errOutput = $output | Where-Object {$_.Type -eq 'Error'}
-if ($null -eq $errOutput -or $errOutput.Count -eq 0)
+if ($null -eq $errOutput -or 0 -eq $errOutput.Count)
 {
     Write-Output "Job run successfully!"
+    Write-Host 'Press any key to continue'
+    $null = $host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
     Remove-AzAutomationAccount -Name $automationAccount -ResourceGroupName $resourceGroupName -Force
 }
 else
