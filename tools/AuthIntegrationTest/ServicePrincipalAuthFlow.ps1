@@ -42,7 +42,7 @@ param (
     [string]
     $CredentialPrefix,
 
-    [Parameter()]
+    [Parameter(Mandatory = $true)]
     [string]
     $TenantId,
 
@@ -51,12 +51,11 @@ param (
     $ClearContext
 )
 
-Write-Host "ConnectAzAccountLiveTest: ParameterSet = $($PSCmdlet.ParameterSetName)"
+Write-Host "ServicePrincipalAuthFlow: ParameterSet = $($PSCmdlet.ParameterSetName)"
 
 $keyVaultName = if ($KeyVaultName) {$KeyVaultName} else {'LiveTestKeyVault'}
 $servicePrincipalName = if ($ServicePrincipalName) {$ServicePrincipalName} else {'AzurePowerShellAzAccountsTest'}
 $credentialPrefix = if ($CredentialPrefix) {$CredentialPrefix} else {'AzAccountsTest'}
-$tenantId = if ($TenantId) {$TenantId} else {'54826b22-38d6-4fb2-bad9-b7b93a3e9c5a'}
 
 $certificateName = "${credentialPrefix}Certificate"
 $secretName = "${credentialPrefix}Secret"

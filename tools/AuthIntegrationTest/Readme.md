@@ -1,6 +1,6 @@
 ## Deploy ServicePrincipal Test Required Application
 ```pwsh
-Connect-AzAccount -Tenant "54826b22-38d6-4fb2-bad9-b7b93a3e9c5a"
+Connect-AzAccount -Tenant "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
 .\DeployServicePrincipal.ps1 -Path './' -PfxFileName 'AzAccountTestCertificate.pfx'
 ```
 
@@ -15,7 +15,7 @@ Connect-AzAccount -Tenant "54826b22-38d6-4fb2-bad9-b7b93a3e9c5a"
 
 # Test Az.Account Upgrading with ServicePrincipal flows
 ```pwsh
-.\TestAzAccountsUpgradeBySp.ps1 -AzAccountsVersionFrom 2.17.0 -AzAccountsVersionTo 3.0.1 -Path "D:\repos\azure-powershell\tools\TestAzAccounts\" -PfxFileName "AzAccountTestCertificate.pfx" -Debug
+.\TestServicePrincipalAuthFlow.ps1 -AzAccountsVersionFrom 2.17.0 -AzAccountsVersionTo 3.0.1 -Path "D:\repos\azure-powershell\tools\TestAzAccounts\" -PfxFileName "AzAccountTestCertificate.pfx" -Debug
 ```
 
 

@@ -23,8 +23,6 @@ Param
     $CredentialPrefix
 )
 
-#$tenantId = '54826b22-38d6-4fb2-bad9-b7b93a3e9c5a';
-#$subscriptionId = '0b1f6471-1bf0-4dda-aec3-cb9272f09590'
 $subscriptionId = (Get-AzContext).Subscription.Id
 
 $keyVaultName = if ($KeyVaultName) {$KeyVaultName} else {'LiveTestKeyVault'}
