@@ -19,6 +19,7 @@
 -->
 
 ## Upcoming Release
+* Collected authentication method for telemetry in end process of cmdlet.
 
 ## Version 4.0.2
 * Fixed unsigned dll:
