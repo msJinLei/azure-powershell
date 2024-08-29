@@ -18,6 +18,19 @@
         - Additional information about change #1
 -->
 ## Upcoming Release
+* Added MUA support for CMK Encryption properties of Recovery Services Vault. Updated the  VaultProperty command to use underlying Vault APIs.
+* Added additional properties to the output of Get-AzRecoveryServicesVault cmdlet - MoveDetails, MoveState, RedundancySettings, SecureScore, BcdrSecurityLevel, EncryptionProperty.
+
+## Version 7.0.0
+* [Breaking Change] Renamed the property `ResouceType` of `ASRVaultSettings` to `ResourceType`. 
+
+## Version 6.9.0
+* Added support for MUA for disabling vault Immutability, increasing RPO for policy schedule, restore, stop protection with retain data.
+* Added support for Enabling/Disabling the azure monitor and email notification alerts for site recovery in recovery services vault.
+
+## Version 6.8.0
+* Added option to set snapshot consistency type in policy cmdlets for creating or updating enhanced AzureVM policies.
+* Fixed an issue while setting soft delete vault property. 
 
 ## Version 6.7.1
 * Added CRR support for taiwannorth, taiwannorthwest region.

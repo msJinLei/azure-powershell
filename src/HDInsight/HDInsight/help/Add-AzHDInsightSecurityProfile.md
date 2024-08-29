@@ -16,8 +16,8 @@ Adds a security profile to a cluster configuration object.
 ```
 Add-AzHDInsightSecurityProfile [-Config] <AzureHDInsightConfig> -DomainResourceId <String>
  -DomainUserCredential <PSCredential> [-OrganizationalUnitDN <String>] -LdapsUrls <String[]>
- [-ClusterUsersGroupDNs <String[]>] [-DefaultProfile <IAzureContextContainer>] [-WhatIf] [-Confirm]
- [<CommonParameters>]
+ [-ClusterUsersGroupDNs <String[]>] [-DefaultProfile <IAzureContextContainer>]
+ [-ProgressAction <ActionPreference>] [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -48,7 +48,7 @@ $clusterCreds = Get-Credential
 #Security profile info
 $domain="sampledomain.onmicrosoft.com"
 $domainUser="sample.user@sampledomain.onmicrosoft.com"
-$domainPassword=ConvertTo-SecureString "domainPassword" -AsPlainText -Force
+$domainPassword=ConvertTo-SecureString -String "****" -AsPlainText -Force
 $domainUserCredential=New-Object System.Management.Automation.PSCredential($domainUser, $domainPassword)
 $organizationalUnitDN="ou=testunitdn"
 $ldapsUrls=("ldaps://sampledomain.onmicrosoft.com:636","ldaps://sampledomain.onmicrosoft.com:389")
@@ -178,6 +178,21 @@ Distinguished name of the organizational unit in the Active directory where user
 Type: System.String
 Parameter Sets: (All)
 Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -ProgressAction
+{{ Fill ProgressAction Description }}
+
+```yaml
+Type: System.Management.Automation.ActionPreference
+Parameter Sets: (All)
+Aliases: proga
 
 Required: False
 Position: Named
