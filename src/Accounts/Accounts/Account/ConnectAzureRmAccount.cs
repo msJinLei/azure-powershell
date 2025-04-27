@@ -517,8 +517,7 @@ namespace Microsoft.Azure.Commands.Profile
                     return;
                 }
 
-                IHttpOperationsFactory httpClientFactory = null;
-                AzureSession.Instance.TryGetComponent(HttpClientOperationsFactory.Name, out httpClientFactory);
+                AzureSession.Instance.TryGetComponent(HttpClientOperationsFactory.Name, out IHttpOperationsFactory httpClientFactory);
 
                 SetContextWithOverwritePrompt((localProfile, profileClient, name) =>
                 {
